@@ -25,5 +25,10 @@ fi
 [ -f "$ROOT/assets/u4_cht.tab" ] || python3 "$ROOT/tools/build_lookup.py" --out "$ROOT/assets/u4_cht.tab"
 cp "$ROOT/assets/cjk_font.bin" "$ROOT/assets/u4_cht.tab" "$XU4/"
 
+echo "[4/4] vendor module 中文化(vendors.b 模板 → 中文)"
+python3 "$ROOT/tools/patch_vendor_boron.py" \
+  --vendors "$XU4/module/Ultima-IV/vendors.b" \
+  --bilingual "$ROOT/dumps/vendor_bilingual.json"
+
 echo "完成。重建:docker build -f docker/Dockerfile.zh -t u4cht/xu4-allegro xu4"
 echo "自測截圖:docker run --rm -e U4CHT_SELFTEST=1 -v /tmp/u4shot:/out u4cht/xu4-test 6 3"

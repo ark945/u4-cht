@@ -351,6 +351,12 @@ CJK 字型 + H1 hook PoC,headless Docker 驗證通過:
 - 🟠 **新發現:intro 故事文字 `showText` 未 hook**(英文)—— 另一文字路徑(不同於 textAt/screenMessageN),與標題動畫同屬 intro 子系統,follow-up。
 - 標題動畫 2x 嘗試兩種 approach(2x 元素系統 / 排除 BKGD_INTRO + drawTitle 2x-blit)皆因 **BKGD_INTRO 雙重用途(背景 + 元素源)+ uint8 plot 座標 + SIGNATURE 漸層**糾纏,已還原;屬獨立深度子任務。
 
+**vendor / 戰鬥 驗證 + 修(2026-06-04)**:
+- 追路徑:vendor `>>` → `script_boron.cpp:cf_screenMessage` → `screenMessage()`(經 H1 hook);**但 Boron `construct` 在 screenMessage 前已代入佔位符 `@ % $`** → en lookup 不命中 → vendor 多數英文。
+- **戰鬥 ✅**:`screenMessage(fmt,args)` 字面 → **format-aware hook 命中**(已翻)。
+- **vendor 修 = module 層中文化**:`tools/patch_vendor_boron.py` 把 `vendors.b` 的 en 模板就地換 zh(佔位符保留;`@ % $` ASCII <0x80 不撞 UTF-8)→ construct 填入 zh 模板 → screenMessage 收 zh → CJK 渲染。**295/300 字串替換,模組打包 + 開機正常**。整合進 `apply_cht.sh [4/4]`。
+- ⚠️ vendor 實機(進城商店)截圖驗證待補(headless 難達);機制與已運作的訊息路徑相同。
+
 ---
 
 ## 11. 風險與待決 (RAID)
