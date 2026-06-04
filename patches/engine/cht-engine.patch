@@ -78,7 +78,7 @@ index a7cd166..88c3ff4 100644
      //info->tex = gpu_makeTexture(info->image);
  
 diff --git a/src/intro.cpp b/src/intro.cpp
-index acdf1f7..85d9878 100644
+index acdf1f7..5e525fb 100644
 --- a/src/intro.cpp
 +++ b/src/intro.cpp
 @@ -20,6 +20,7 @@
@@ -98,6 +98,51 @@ index acdf1f7..85d9878 100644
                          vertoffset);
  }
  
+@@ -764,7 +765,7 @@ void IntroController::updateScreen() {
+     case INTRO_MENU:
+         // draw the extended background for all option screens
+         backgroundArea.draw(BKGD_INTRO);
+-        backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++        backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ 
+         // if there is an error message to display, show it
+         if (xu4.errorMessage)
+@@ -780,7 +781,7 @@ void IntroController::updateScreen() {
+             EventHandler::wait_msecs(3000);
+             // clear the screen again
+             backgroundArea.draw(BKGD_INTRO);
+-            backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++            backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+         }
+ 
+         menuArea.textAt(1,  1, "In another world, in a time to come.");
+@@ -808,7 +809,7 @@ void IntroController::updateScreen() {
+ void IntroController::initiateNewGame() {
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_INTRO);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ 
+     // display name prompt and read name from keyboard
+     menuArea.textAt(3, 3, "By what name shalt thou be known");
+@@ -831,7 +832,7 @@ void IntroController::initiateNewGame() {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_INTRO);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ 
+     // display sex prompt and read sex from keyboard
+     menuArea.textAt(3, 3, "Art thou Male or Female?");
+@@ -1103,7 +1104,7 @@ void IntroController::journeyOnward() {
+ void IntroController::about() {
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_INTRO);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ 
+     screenHideCursor();
+     menuArea.textAtFmt(14, 1, "XU4 %s", VERSION);
 @@ -1125,7 +1126,9 @@ void IntroController::about() {
   * Shows text in the question area.
   */
@@ -109,6 +154,147 @@ index acdf1f7..85d9878 100644
      int lineNo = 0;
  
      questionArea.clear();
+@@ -1270,7 +1273,7 @@ void IntroController::updateConfMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ }
+ 
+ void IntroController::updateVideoMenu(MenuEvent &event) {
+@@ -1307,7 +1310,7 @@ void IntroController::updateVideoMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ }
+ 
+ void IntroController::updateGfxMenu(MenuEvent &event)
+@@ -1327,7 +1330,7 @@ void IntroController::updateGfxMenu(MenuEvent &event)
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ }
+ 
+ void IntroController::updateSoundMenu(MenuEvent &event) {
+@@ -1361,7 +1364,7 @@ void IntroController::updateSoundMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ }
+ 
+ void IntroController::updateInputMenu(MenuEvent &event) {
+@@ -1389,7 +1392,7 @@ void IntroController::updateInputMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ 
+     // after drawing the menu, extra menu text can be added here
+     extendedMenuArea.textAt(0, 5, "Mouse Options:");
+@@ -1420,7 +1423,7 @@ void IntroController::updateSpeedMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ }
+ 
+ void IntroController::updateGameplayMenu(MenuEvent &event) {
+@@ -1444,7 +1447,7 @@ void IntroController::updateGameplayMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ }
+ 
+ void IntroController::updateInterfaceMenu(MenuEvent &event) {
+@@ -1468,7 +1471,7 @@ void IntroController::updateInterfaceMenu(MenuEvent &event) {
+ 
+     // draw the extended background for all option screens
+     backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
+-    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
++    backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 240);
+ 
+     // after drawing the menu, extra menu text can be added here
+     extendedMenuArea.textAt(2, 3, "  (Open, Jimmy, etc.)");
+@@ -1703,8 +1706,8 @@ void IntroController::initTitles()
+ void IntroController::addTitle(int x, int y, int w, int h, AnimType method, int delay, int duration)
+ {
+     AnimElement data = {
+-        x, y,               // source x and y
+-        w, h,               // source width and height
++        x * 2, y * 2,       // U4 繁中化 B:2x(抽取/destImage/落點皆 640 space)
++        w * 2, h * 2,       // source width and height
+         method,             // render method
+         0,                  // animStep
+         0,                  // animStepMax
+@@ -1777,8 +1780,8 @@ void IntroController::getTitleSourceData()
+                         color = info->image->setColor(255, (y == 2 ? 250 : 255), blue[y-1]);
+                     }
+                     AnimPlot plot = {
+-                        uint8_t(x),
+-                        uint8_t(y),
++                        int16_t(x * 2),     // U4 繁中化 B:2x 位置(漸層仍用 1x y)
++                        int16_t(y * 2),
+                         uint8_t(color.r),
+                         uint8_t(color.g),
+                         uint8_t(color.b),
+@@ -1800,15 +1803,15 @@ void IntroController::getTitleSourceData()
+             {
+                 for (int y=0; y < titles[i].rh; y++)
+                 {
+-                    // Here x is set to exclude PRESENT at top of image.
+-                    int x = (y < 6) ? 133 : 0;
++                    // Here x is set to exclude PRESENT at top of image.(U4 繁中化 B:2x)
++                    int x = (y < 12) ? 266 : 0;
+                     for ( ; x < titles[i].rw ; x++)
+                     {
+                         titles[i].srcImage->getPixel(x, y, r, g, b, a);
+                         if (r || g || b)
+                         {
+                             AnimPlot plot = {
+-                                uint8_t(x+1), uint8_t(y+1),
++                                int16_t(x+1), int16_t(y+1),
+                                 uint8_t(r), uint8_t(g), uint8_t(b), uint8_t(a)
+                             };
+                             titles[i].plotData.push_back(plot);
+@@ -1904,12 +1907,12 @@ bool IntroController::updateTitle()
+         {
+             while (animStepTarget > title->animStep)
+             {
+-                // blit the pixel-pair to the src surface
++                // blit the pixel-pair to the src surface(U4 繁中化 B:2x → 4x2)
+                 title->destImage->fillRect(
+                     title->plotData[title->animStep].x,
+                     title->plotData[title->animStep].y,
++                    4,
+                     2,
+-                    1,
+                     title->plotData[title->animStep].r,
+                     title->plotData[title->animStep].g,
+                     title->plotData[title->animStep].b);
+diff --git a/src/intro.h b/src/intro.h
+index c21ef93..f0c1c6a 100644
+--- a/src/intro.h
++++ b/src/intro.h
+@@ -257,7 +257,7 @@ private:
+     };
+ 
+     struct AnimPlot {
+-        uint8_t x, y;
++        int16_t x, y;           // U4 繁中化 B:uint8→int16 容 640 座標
+         uint8_t r, g, b, a;
+     };
+ 
 diff --git a/src/screen.cpp b/src/screen.cpp
 index 46d51bd..70c9e3b 100644
 --- a/src/screen.cpp

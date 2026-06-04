@@ -341,7 +341,10 @@ CJK 字型 + H1 hook PoC,headless Docker 驗證通過:
 - `12_bfull_charcreate.png`:命名提示「汝之名…為何 / 於此世此刻?」連續兩行**不再重疊**。
 - `11_bfull_map.png`:Britannia 地圖 2x 正確填滿。
 
-**🟠 唯一剩餘(intro 眼花,follow-up)**:「Ultima IV」動畫標題字母錯位 —— `AnimElement`/`AnimPlot` 用 **uint8_t 座標(上限 255,放不下 640)**+ TITLE srcImage 1x 抽取 2x 影像。需 `AnimPlot` uint8→uint16 + addTitle 座標 2x + SIGNATURE plot 2×2 block。**屬 intro 動畫子系統,不影響選單/gameplay**。
+**標題動畫 2x — ✅ 已修(2026-06-04,第三次成功)**:
+- `AnimPlot` x,y `uint8_t`→`int16_t`(容 640 座標);`addTitle` 座標 `x,y,w,h` ×2(抽取/destImage/落點全 640 space);SIGNATURE plot ×2 位置(漸層仍用 1x y)+ fillRect 2×1→4×2;TITLE plot int16 + PRESENT 排除 133→266/y<6→y<12;`BKGD_OPTIONS_BTM` 13 處 (0,120)→(0,240)。
+- 結果:**標題畫面 + 選單完美**(「Ultima IV」清晰、QUEST OF THE AVATAR、雙龍、藍框位置正確、CJK 選單乾淨)。`docs/screenshots/17_bfull_title_fixed.png`、`10_bfull_menu.png`。
+- 註:先前「選單頂部糊」實為**截圖時機太早**(title 動畫轉場中);settle 後完美。
 
 **A regime**(320/14px/2 列距)保留於 git 歷史 `ddca555`,可復原。
 
