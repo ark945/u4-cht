@@ -287,7 +287,8 @@ CJK 字型 + H1 hook PoC,headless Docker 驗證通過:
 - **資料側**:`tools/build_cjk_font.py`(掃四源 zh → 1978 唯一漢字 → **Noto Sans CJK TC Medium**(`--index 3`)烘 16×16 atlas `assets/cjk_font.bin`)+ `tools/build_lookup.py`(四源合併 en→zh 二進位 `assets/u4_cht.tab`,2614 條,依 en 排序)。
   - **字型可讀性**(2026-06-04):
     - 字型:Noto Sans CJK TC **Medium** 優於 AR PL UMing(Ming serif 細筆易斷)與 Noto Bold(密筆糊);對比 `docs/screenshots/03_font_compare.png`。
-    - **灰階 AA**:`build_cjk_font.py --mode gray`(預設)存抗鋸齒 alpha,`cjkBlit` 用該值混黑底(二值 atlas 仍相容)→ 斜筆/曲線鋸齒減少;對比 `docs/screenshots/04_aa_compare.png`。註:xu4 預設 nearest-neighbor 放大會部分削弱 AA,搭配 `--filter` 線性放大效果更明顯。
+    - **灰階 AA**:`build_cjk_font.py --mode gray`(預設)存抗鋸齒 alpha,`cjkBlit` 用該值混黑底(二值 atlas 仍相容)→ 斜筆/曲線鋸齒減少;對比 `docs/screenshots/04_aa_compare.png`。
+    - **放大 filter**:xu4 預設 `--filter point`(nearest-neighbor)會把 AA gray 邊緣放大成方塊、部分削弱 AA。`--filter` 無字面 linear,但平滑放大器(`xBRZ` / `HQX`)會把 AA 邊緣補成連續筆畫 → **`--filter xBRZ` + 灰階 AA 最平滑可讀**;對比 `docs/screenshots/05_filter_compare.png`。
 - **引擎側**(`patches/engine/`,套用 `tools/apply_cht.sh`):
   - 新模組 `cht.cpp/h`:載入資產 + `chtLookup`(二分)+ `chtGlyph`。
   - `screen.cpp`:`cjkBlit`(16×16 全形,**灰階 alpha 混色** blit 到 `xu4.screenImage`)+ `screenMessageCJK`(UTF-8、CJK-aware 換行)+ **H1 `screenMessageN` 進入查表命中改走 CJK**;`chtSelfTest`(env 守護)。

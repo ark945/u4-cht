@@ -115,6 +115,9 @@ docker run --rm -v /tmp/u4shot:/out u4cht/xu4-test 22 3   # → /tmp/u4shot/scre
 ![aa-compare](docs/screenshots/04_aa_compare.png)
 *灰階 AA:二值(左)→ 灰階抗鋸齒(右),`cjkBlit` 以 alpha 混黑底,斜筆/曲線鋸齒減少。*
 
+![filter-compare](docs/screenshots/05_filter_compare.png)
+*放大 filter:預設 `--filter point`(NN,左,AA 邊緣呈方塊)→ `--filter xBRZ`(平滑放大,右)把 AA 補成連續筆畫,最平滑可讀。*
+
 ---
 
 <a name="技術架構"></a>
