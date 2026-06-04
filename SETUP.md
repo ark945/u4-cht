@@ -125,7 +125,7 @@ python3 tools/talk_batches.py merge --in dumps/talk_bilingual.json
 ```bash
 # 產生 CJK 字型 atlas(掃四源 zh,1978 漢字)+ en→zh 二進位 lookup
 python3 tools/build_cjk_font.py --font /usr/share/fonts/opentype/noto/NotoSansCJK-Medium.ttc \
-  --index 3 --size 16 --mode gray --out assets/cjk_font.bin --preview assets/cjk_preview.png
+  --index 3 --size 14 --cell 16 --mode gray --out assets/cjk_font.bin --preview assets/cjk_preview.png
 # (--index 3 = Noto Sans CJK TC;--mode gray = 灰階抗鋸齒,預設;Medium 比 Ming/Bold 易讀)
 python3 tools/build_lookup.py --out assets/u4_cht.tab
 

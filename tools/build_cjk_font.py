@@ -67,7 +67,10 @@ def main():
     ap.add_argument("--font", required=True)
     ap.add_argument("--index", type=int, default=0,
                     help=".ttc face index(Noto Sans CJK TC = 3)")
-    ap.add_argument("--size", type=int, default=16)
+    ap.add_argument("--size", type=int, default=16,
+                    help="字型 glyph 像素大小")
+    ap.add_argument("--cell", type=int, default=0,
+                    help="atlas cell 邊長(預設 = size);可大於 size 讓 glyph 縮小置中")
     ap.add_argument("--mode", choices=["gray", "binary"], default="gray",
                     help="gray=抗鋸齒 alpha(預設);binary=二值化")
     ap.add_argument("--out", required=True)
@@ -75,9 +78,8 @@ def main():
     args = ap.parse_args()
 
     chars = collect_codepoints()
-    # 字型 size 略小於 cell 留邊
-    font = ImageFont.truetype(args.font, args.size - 1, index=args.index)
-    W = H = args.size
+    font = ImageFont.truetype(args.font, args.size, index=args.index)
+    W = H = args.cell if args.cell > 0 else args.size   # cell 可大於字型 → 留邊置中
 
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     glyphs = []

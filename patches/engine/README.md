@@ -8,7 +8,7 @@
 | 檔案 | 說明 |
 |---|---|
 | `cht.h` / `cht.cpp` | 新模組:載入 `cjk_font.bin`/`u4_cht.tab`,提供 `chtLookup`(en→zh,二分查找)+ `chtGlyph`(CJK 16×16 alpha) |
-| `cht-engine.patch` | 改 `src/screen.cpp`(+`cjkBlit`/`screenMessageCJK`/H1 hook/self-test)、`project.b`、`src/Makefile.common`(編譯掛載) |
+| `cht-engine.patch` | 改 `src/screen.cpp`(+CJK 渲染)、`src/textview.cpp`(選單/角色創建 hook)、`src/intro.cpp`(固定版面 2 列距)(+`cjkBlit`/`screenMessageCJK`/H1 hook/self-test)、`project.b`、`src/Makefile.common`(編譯掛載) |
 
 ## 套用
 

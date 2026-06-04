@@ -22,6 +22,40 @@ index 6736af1..ac16f35 100644
          creature.cpp \
          death.cpp \
          debug.cpp \
+diff --git a/src/intro.cpp b/src/intro.cpp
+index acdf1f7..fb6d36d 100644
+--- a/src/intro.cpp
++++ b/src/intro.cpp
+@@ -783,13 +783,13 @@ void IntroController::updateScreen() {
+             backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
+         }
+ 
+-        menuArea.textAt(1,  1, "In another world, in a time to come.");
+-        menuArea.textAt(14, 3, "Options:");
+-        menuArea.textAtKey(10, 5, "Return to the view", 0);
+-        menuArea.textAtKey(10, 6, "Journey Onward", 0);
+-        menuArea.textAtKey(10, 7, "Initiate New Game", 0);
++        /* U4 繁中化:CJK 16px 需 2 列距,主選單改 2-row 間隔(避免重疊) */
++        menuArea.textAt(1,  0, "In another world, in a time to come.");
++        menuArea.textAtKey(10, 2, "Return to the view", 0);
++        menuArea.textAtKey(10, 4, "Journey Onward", 0);
++        menuArea.textAtKey(10, 6, "Initiate New Game", 0);
+         menuArea.textAtKey(10, 8, "Configure", 0);
+-        menuArea.textAtKey(10, 9, "About", 0);
++        menuArea.textAtKey(10, 10, "About", 0);
+         drawBeasties();
+ 
+         // draw the cursor last
+@@ -811,7 +811,8 @@ void IntroController::initiateNewGame() {
+     backgroundArea.draw(BKGD_OPTIONS_BTM, 0, 120);
+ 
+     // display name prompt and read name from keyboard
+-    menuArea.textAt(3, 3, "By what name shalt thou be known");
++    // U4 繁中化:CJK 16px 需 2 列距,兩行提示改 row 2/4
++    menuArea.textAt(3, 2, "By what name shalt thou be known");
+     menuArea.textAt(3, 4, "in this world and time?");
+ 
+     // enable the text cursor after setting it's initial position
 diff --git a/src/screen.cpp b/src/screen.cpp
 index 46d51bd..18b67b2 100644
 --- a/src/screen.cpp

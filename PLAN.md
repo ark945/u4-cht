@@ -306,7 +306,11 @@ CJK 字型 + H1 hook PoC,headless Docker 驗證通過:
 - ✅ 主選單中文(啟程冒險/開始新遊戲/設定/關於)、命名提示、**性別提問「汝為男子抑或女子?」完美**。
 - 截圖 `docs/screenshots/06_intro_menu_cht.png`、`07_charcreate_cht.png`。
 
-**🟠 已知問題(P7 待修)— 固定版面列距**:孤立單行 CJK 完美;但**選單列表 / 多行 prompt** 在 caller 硬編 8px 列距下,CJK 16px **垂直重疊**。訊息區(`screenMessageN`/`screenMessageCJK`)已用 `line+=2` 避開,對白 OK;**固定版面螢幕需 caller 端(intro.cpp)CJK-aware 列距**。
+**固定版面列距 — ✅ 已修(2026-06-04)**:
+- `intro.cpp` 主選單 5 項改 2 列距(rows 2/4/6/8/10,捨「Options:」)、命名提示兩行改 row 2/4。
+- **CJK 縮為 14px 置中於 16px cell**(`build_cjk_font.py --size 14 --cell 16`)→ 行距有呼吸空間、更清晰、「文字小一點」;引擎 `cjkBlit` 仍以 cell(16)為步距,免改。
+- 對比 `docs/screenshots/08_cjk_14px.png`(16px 滿格相黏 → 14px 行距清楚)、主選單 `06_intro_menu_cht.png`。
+- ⚠️ 仍屬「2 列距」方案:固定螢幕用較多垂直空間(選項較少可見)。徹底解 = 640×400 內部解析度(見 §10h spike)。
 
 **建置 gotcha 修正**:Docker `COPY` 層快取會用舊 source/資產 → `Dockerfile.zh` 加 `ARG CACHEBUST`(改碼後 `--build-arg CACHEBUST=<新值>` 強制重編);`textview.cpp` 補 `<cstring>`。
 
