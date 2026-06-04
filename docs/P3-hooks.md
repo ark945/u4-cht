@@ -128,5 +128,17 @@ B. GUI / 選單 / 遊戲瀏覽器(.txf SDF 紋理字,uint16 碼位)──── 
 - `%c…%c` = 顏色碼包裹(FG 切換),翻譯時保留 `%c`;含 `%s/%d` 者於 H1 hook 需 format-aware(post-vsnprintf 比對或 fragment)。
 - 原版拼寫不一致(`Not here!` vs `Not Here!`、`Hmm...No effect!` vs `Hmmm--No Effect!`)→ 翻譯 glossary 需正規化映同一中文(U6 坑 #7)。
 
-### 尚未涵蓋(後續純資料項)
-- **vendor 文字**:走 Boron module 腳本(`module/Ultima-IV/*.b`),非 `u4read_stringtable` / 非硬編 C 字面 → 需另寫 Boron 腳本字串抽取。
+### (d) vendor Boron 腳本 — `tools/extract_vendor_boron.py`(純文字抽取,不執行 Boron)
+
+| 項目 | 數 |
+|---|---|
+| 來源 | `module/Ultima-IV/vendors.b`(36KB Boron 腳本) |
+| raw 字面(含 control 3) | 300 |
+| 唯一真文字字串 | **278**(其中 `{…}` 多行 19) |
+| 含佔位符(`@`店名 `%`店主 `$`價 `#`量 `=`物品 `$gp`) | 62 |
+
+→ `dumps/vendor_bilingual.json`(en + zh 待填 + kind + has_placeholder)+ `dumps/vendor_report.md`。
+解析處理 Boron `"…"` / `{…}`(巢狀)/ `^` escape / `;` 與 `/* */` 註解;`{{…}}` 雙括號殘留外層已 strip。
+
+### 仍未涵蓋(低優先,後續視需要)
+- `maps.b`(地圖告示牌 / sign)、`config.b` 內零星 Boron 文字 — 非 vendor 主體,量小,可同一工具擴 `--files` 處理。

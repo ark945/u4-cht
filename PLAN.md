@@ -260,9 +260,10 @@ U6-cht 的核心經驗可直接套用:
 |---|---|---|---|
 | `tools/extract_stringtable.py` | `title.exe` + `avatar.exe`(`u4read_stringtable`) | **114** 字串(intro 28+24+15、codex 11、endgame 7+5、shrine 24) | `dumps/stringtable_bilingual.json` + `_report.md` |
 | `tools/extract_hardcoded.py` | `xu4/src` 靜態分析 `screenMessage` 系列字面 | **420** call site / **318** 唯一 / 128 含 format / 26 dynamic | `dumps/hardcoded_strings.json` + `_report.md` |
+| `tools/extract_vendor_boron.py` | `module/Ultima-IV/vendors.b` Boron 腳本 | **278** 唯一 vendor 字串(19 braced / 62 含佔位) | `dumps/vendor_bilingual.json` + `_report.md` |
 
-- 翻譯注意:`%c…%c` 顏色碼保留;含 `%s/%d` 需 format-aware hook;原版拼寫不一致需 glossary 正規化。
-- **尚未涵蓋**:vendor 文字(Boron module 腳本 `module/Ultima-IV/*.b`),非 stringtable / 非硬編 C 字面 → 後續另寫 Boron 抽取。
+- 翻譯注意:`%c…%c` 顏色碼保留;含 `%s/%d` 需 format-aware hook;vendor 佔位 `@ % $ # = $gp` 保留;原版拼寫不一致需 glossary 正規化。
+- **資料面收尾**:`.TLK` 256 NPC + stringtable 114 + 硬編 318 + vendor 278 = **資料面四源齊備**;僅剩 `maps.b`/`config.b` 零星告示牌(低優先)。
 - 詳見 `docs/P3-hooks.md` §7。
 
 ---
@@ -291,7 +292,8 @@ U6-cht 的核心經驗可直接套用:
    - (a) `.TLK` 256 NPC 對話 → 雙語表(§10c)。
    - (b) `u4read_stringtable` 114 字串(intro/codex/endgame/shrine)→ `dumps/stringtable_bilingual.json`(§10d)。
    - (c) 硬編 `screenMessage` 字面 420 site / 318 唯一 → `dumps/hardcoded_strings.json`(§10d)。
-   - 待做:vendor(Boron 腳本)抽取;之後進字型/翻譯/接 hook。
+   - (d) vendor Boron 腳本 `vendors.b` 278 唯一字串 → `dumps/vendor_bilingual.json`(§10d)。
+   - **資料面四源齊備**;下一步進字型 / 翻譯 / 接 hook(才動引擎)。
 6. 保留 `u4remastered/src/talk/talk.json` 作為翻譯底本與 oracle。
 7. **git repo — ✅ 本地已 init(2026-06-04)**:納管 PLAN/SETUP/docker/docs/tools/dumps;上游 `xu4/`、`u4remastered/`、原始資料 `data/` 由 `.gitignore` 排除。**push 遠端待使用者確認**。
 

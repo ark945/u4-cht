@@ -78,6 +78,10 @@ python3 tools/extract_stringtable.py --data-dir data \
 # 硬編 screenMessage 字面(靜態分析 xu4/src)→ 420 site / 318 唯一
 python3 tools/extract_hardcoded.py --src-dir xu4/src \
   --out dumps/hardcoded_strings.json --out-report dumps/hardcoded_report.md
+
+# vendor Boron 腳本(vendors.b)→ 278 唯一字串
+python3 tools/extract_vendor_boron.py --files xu4/module/Ultima-IV/vendors.b \
+  --out dumps/vendor_bilingual.json --out-report dumps/vendor_report.md
 ```
 
 ## 檔案
@@ -91,9 +95,11 @@ python3 tools/extract_hardcoded.py --src-dir xu4/src \
 | `tools/extract_tlk.py` | 抽 DOS `.TLK` NPC 對話 + 對齊 talk.json → 雙語表 |
 | `tools/extract_stringtable.py` | 抽 `u4read_stringtable`(intro/codex/shrine)114 字串 |
 | `tools/extract_hardcoded.py` | 靜態抽硬編 `screenMessage` 字面 → 318 唯一字串 |
+| `tools/extract_vendor_boron.py` | 抽 `vendors.b` Boron 腳本 → 278 唯一 vendor 字串 |
 | `dumps/talk_bilingual.json` | 256 NPC × 12 欄雙語表雛形(en 已填,zh 待填) |
 | `dumps/stringtable_bilingual.json` | 114 intro/codex/shrine 字串雙語雛形 |
 | `dumps/hardcoded_strings.json` | 318 唯一硬編字串(en + zh 待填 + has_format) |
+| `dumps/vendor_bilingual.json` | 278 唯一 vendor 字串(en + zh 待填 + has_placeholder) |
 | `dumps/*_report.md` | 各抽取的對齊/統計報告 |
 | `docs/` | P3 hook 盤點等工程文件 |
 | `data/`(gitignore) | 原始遊戲資料(zip / `.TLK`),由 `make download` 重建 |
