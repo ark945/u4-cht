@@ -209,7 +209,7 @@ U6-cht 的核心經驗可直接套用:
 | **P0 決策確認** ★ | 確認改走 xu4(見 §12);取得 PC 版 U4 資料檔 | ✅ **已完成**:決策拍板;`make download` 自動抓 freeware 資料 |
 | **P1 引擎建置** | Docker(Allegro 5)build xu4 → 二進位 + 模組 + 資料就位 | ✅ **已完成**:`Dockerfile.zh` build 成功(見 §6a) |
 | **P2 字型 PoC** | headless 截圖 loop + 文字架構盤點 + 字型可行性驗證 | ✅ **loop+驗證完成**(§10a/§9);畫出中文字移至 P4(需先建字型資產) |
-| **P3 文字 hook 盤點** | grep xu4 所有輸出 codepath,產 hook backlog | hook 清單文件 |
+| **P3 文字 hook 盤點** | grep xu4 所有輸出 codepath,產 hook backlog | ✅ **已完成**:`docs/P3-hooks.md`(H1–H8 + 字串來源 + P4 backlog) |
 | **P4 字串抽取 + 對齊** | 抽英文字串,對齊 `talk.json` 底本,建雙語表 | 雙語對照表 |
 | **P5 翻譯** | 對話 + 系統字串中文化(glossary + 文白並用) | 翻譯資料 JSON |
 | **P6 整合驗證** | lookup 接上、CJK 換行、game tester 背景跑最小遊玩迴圈 | tester 無 regression |
@@ -258,7 +258,7 @@ U6-cht 的核心經驗可直接套用:
 1. **★ 決策確認(P0)— ✅ 已拍板(2026-06-04)**:使用者確認**放棄 u4remastered 作引擎基礎,改用 xu4**;後端採 Allegro 5(D3-a)。
 2. **P1 引擎建置 — ✅ 已完成(2026-06-04)**:`Dockerfile.zh` build 成功,xu4 vDR-1.0 + 完整資料模組就位(見 §10a)。
 3. **P2 引擎/字型驗證 — ✅ 已完成(2026-06-04)**:headless 截圖 loop 成立(截到標題畫面,見 §10b);文字架構盤點 + 字型可行性定讞(§9)。
-4. **P3 進行中**:文字 hook 盤點 — grep xu4 所有文字輸出 codepath,產 hook backlog(`docs/P3-hooks.md`)。
+4. **P3 文字 hook 盤點 — ✅ 已完成(2026-06-04)**:`docs/P3-hooks.md`。核心:**H1 `screenMessageN` 是遊戲內所有捲動文字(含 NPC 對話)的單一中央漏斗(417 個 `screenMessage` call site 匯入)**,對應 U6 `MsgScroll` hook。下一步 P4(抽字串 + CJK 字庫 + 接 hook)。
 5. 保留 `u4remastered/talk/talk.json` 作為翻譯底本與 oracle。
 6. **git repo — ✅ 本地已 init(2026-06-04)**:納管 PLAN/SETUP/docker/docs;上游 `xu4/`、`u4remastered/` 由 `.gitignore` 排除。**push 遠端待使用者確認**。
 
