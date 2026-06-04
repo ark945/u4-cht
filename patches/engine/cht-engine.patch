@@ -78,10 +78,18 @@ index a7cd166..88c3ff4 100644
      //info->tex = gpu_makeTexture(info->image);
  
 diff --git a/src/intro.cpp b/src/intro.cpp
-index acdf1f7..f7efa53 100644
+index acdf1f7..85d9878 100644
 --- a/src/intro.cpp
 +++ b/src/intro.cpp
-@@ -661,7 +661,7 @@ void IntroController::drawBeastie(int beast, int vertoffset, int frame) {
+@@ -20,6 +20,7 @@
+ #include "u4file.h"
+ #include "utils.h"
+ #include "xu4.h"
++#include "cht.h"      // U4 繁中化
+ 
+ #ifdef GPU_RENDER
+ extern bool loadMapData(Map *map, U4FILE *uf, Symbol borderTile);
+@@ -661,7 +662,7 @@ void IntroController::drawBeastie(int beast, int vertoffset, int frame) {
      ASSERT(beast == 0 || beast == 1, "invalid beast: %d", beast);
  
      backgroundArea.draw(beastiesImg, beastieSub[beast] + frame,
@@ -90,6 +98,17 @@ index acdf1f7..f7efa53 100644
                          vertoffset);
  }
  
+@@ -1125,7 +1126,9 @@ void IntroController::about() {
+  * Shows text in the question area.
+  */
+ void IntroController::showText(const string &text) {
+-    string current = text;
++    /* U4 繁中化:intro 故事整段查表(key 含 \n),命中用中文再逐行渲染 */
++    const char* zh = chtLookup(text.c_str(), (int) text.length());
++    string current = zh ? zh : text;
+     int lineNo = 0;
+ 
+     questionArea.clear();
 diff --git a/src/screen.cpp b/src/screen.cpp
 index 46d51bd..70c9e3b 100644
 --- a/src/screen.cpp
