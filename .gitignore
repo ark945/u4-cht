@@ -1,0 +1,15 @@
+# Upstream clones(vendored、可由 clone 重建,不納入本 repo)
+/xu4/
+/u4remastered/
+
+# 建置/執行產物
+*.mod
+*.pak
+ultima4.zip
+u4upgrad.zip
+/out/
+*.log
+
+# OS / 編輯器
+.DS_Store
+*.swp

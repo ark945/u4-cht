@@ -1,0 +1,29 @@
+# xu4 (Allegro 5) Linux build — for U4 繁中化專案
+# 自源碼建 Boron + Faun,Allegro 5 後端,make download 抓 freeware U4 資料。
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential git make curl ca-certificates pkg-config \
+      libpng-dev libvorbis-dev libogg-dev libpulse-dev \
+      liballegro5-dev liballegro-acodec5-dev liballegro-audio5-dev \
+ && rm -rf /var/lib/apt/lists/*
+
+# Boron:程式(模組打包用)+ libboron.a/headers(連結 xu4 用),同源建置
+RUN git clone https://git.code.sf.net/p/urlan/boron/code /tmp/boron \
+ && cd /tmp/boron && git checkout v2.0.8 \
+ && ./configure --static --thread \
+ && make \
+ && make DESTDIR=/usr install \
+ && make DESTDIR=/usr install-dev
+
+COPY . /build/xu4
+WORKDIR /build/xu4
+
+# Faun 音訊庫(submodule 已就位)
+RUN cd src/faun && ./configure --no_flac && make && make DESTDIR=/usr install
+
+# Allegro 後端 configure → 抓資料 → build 二進位 + 模組
+RUN ./configure --allegro && make download && make
+
+CMD ["/build/xu4/src/xu4"]

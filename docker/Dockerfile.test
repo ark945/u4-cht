@@ -1,0 +1,10 @@
+# 在 xu4 Allegro build 之上加 headless 截圖工具(xvfb + Mesa 軟體 GL + ImageMagick)
+FROM u4cht/xu4-allegro
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      xvfb x11-utils x11-apps imagemagick xauth \
+      libgl1-mesa-dri mesa-utils \
+ && rm -rf /var/lib/apt/lists/*
+COPY shot.sh /usr/local/bin/shot.sh
+RUN chmod +x /usr/local/bin/shot.sh
+ENTRYPOINT ["/usr/local/bin/shot.sh"]
