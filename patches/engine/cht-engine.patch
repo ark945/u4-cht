@@ -23,19 +23,104 @@ index 6736af1..ac16f35 100644
          death.cpp \
          debug.cpp \
 diff --git a/src/event.cpp b/src/event.cpp
-index 0bef0c9..020b9cf 100644
+index 0bef0c9..7accd7f 100644
 --- a/src/event.cpp
 +++ b/src/event.cpp
-@@ -822,6 +822,9 @@ bool EventHandler::globalKeyHandler(int key) {
+@@ -11,6 +11,7 @@
+ 
+ #include "config.h"
+ #include "context.h"
++#include "game.h"
+ #include "location.h"
+ #include "savegame.h"
+ #include "screen.h"
+@@ -822,6 +823,12 @@ bool EventHandler::globalKeyHandler(int key) {
          xu4.eventHandler->quitGame();
          return true;
  
++    case U4_FKEY + 1:   /* F2:遊玩中即時切換 EGA/VGA tileset */
++        return gameToggleGraphics();
++
 +    case U4_FKEY + 2:   /* F3:循環 game resolution(scale),tile 物理放大(僅遊玩中)*/
 +        return screenCycleScale();
 +
      default:
          return false;
      }
+diff --git a/src/game.cpp b/src/game.cpp
+index 5c359b0..7e0ce3c 100644
+--- a/src/game.cpp
++++ b/src/game.cpp
+@@ -418,6 +418,57 @@ void gameUpdateScreen() {
+     }
+ }
+ 
++/*
++ * U4 繁中化:F2 遊玩中即時切換 EGA(Ultima-IV)↔ VGA(U4-Upgrade)tileset。
++ *
++ * 約束:Boron atom(symbol)per-config(各 config 自建 boron env),故 ImageMgr
++ * 與遊戲查表必須同一個 config → 只能整個換 xu4.config(full swap)。
++ *
++ * 但兩 config 的 maps/tiles 邏輯相同(VGA 模組繼承同一份 rules),所以「換 config +
++ * screenReInit(重建 VGA imageMgr/tileset/tileanims)」後,只需把當前 location 堆疊
++ * 的每張 map 與 mapArea 的 tileset『重新指向』新 config 同 ID 的物件,保留座標。
++ * 不用 setMap(避免把新 Location 疊上舊堆疊 → 先前延遲崩潰之源)。
++ * 隊伍/存檔/座標(party、saveGame、coords)config-independent,不受影響。
++ *
++ * 雙 config 並存(不 free,避免懸空):啟動 config 歸入對應槽,另一套首次 configInit。
++ */
++bool gameToggleGraphics() {
++    if (xu4.stage != StagePlay || !xu4.imageMgr || !c || !c->location)
++        return false;
++
++    static Config* egaCfg = NULL;
++    static Config* vgaCfg = NULL;
++
++    bool curVGA = xu4.imageMgr->usingVGA();
++    if (!egaCfg && !vgaCfg) {
++        if (curVGA) vgaCfg = xu4.config; else egaCfg = xu4.config;
++    }
++
++    bool toVGA = !curVGA;
++    Config*& slot = toVGA ? vgaCfg : egaCfg;
++    if (!slot) {
++        slot = configInit(toVGA ? "U4-Upgrade" : "Ultima-IV",
++                          xu4.settings->soundtrack);
++        if (!slot)
++            return false;
++    }
++
++    /* full swap + 重建 graphics(symbol 一致)*/
++    xu4.config = slot;
++    screenReInit();
++
++    /* 把 location 堆疊每張 map 重新指向新 config 同 ID 的 map(不用 setMap)*/
++    for (Location* loc = c->location; loc; loc = loc->prev) {
++        Map* nm = xu4.config->map(loc->map->id);
++        if (nm) loc->map = nm;
++    }
++    xu4.game->mapArea.reinit();     /* mapArea.tileset 重新指向新 config 的 tileset */
++
++    screenMessage(toVGA ? "\n圖形:VGA\n" : "\n圖形:EGA\n");
++    gameUpdateScreen();
++    return true;
++}
++
+ void GameController::setMap(Map *map, bool saveLocation, const Portal *portal, TurnController *turnCompleter) {
+     int viewMode;
+     LocationContext context;
+diff --git a/src/game.h b/src/game.h
+index 69ca236..9c1a8d2 100644
+--- a/src/game.h
++++ b/src/game.h
+@@ -111,6 +111,7 @@ private:
+ /* map and screen functions */
+ void gameSetViewMode(ViewMode newMode);
+ void gameUpdateScreen();
++bool gameToggleGraphics();      /* U4 繁中化:F2 遊玩中即時切換 EGA/VGA tileset */
+ 
+ /* spell functions */
+ void castSpell(int player = -1);
 diff --git a/src/gpu_opengl.cpp b/src/gpu_opengl.cpp
 index 882a30c..29a699e 100644
 --- a/src/gpu_opengl.cpp
@@ -719,6 +804,34 @@ index 8bfa3de..ba90b57 100644
  
  #include <string>
  #include "view.h"
+diff --git a/src/tileview.cpp b/src/tileview.cpp
+index f13c0c5..3c5e55a 100644
+--- a/src/tileview.cpp
++++ b/src/tileview.cpp
+@@ -46,6 +46,11 @@ TileView::~TileView() {
+ void TileView::reinit() {
+     View::reinit();
+ 
++    /* U4 繁中化:重新指向當前 config 的 tileset。F2 即時切換 EGA/VGA 後 config
++       改變,舊 tileset 的 tile 影像指向已被 screenReInit 釋放的舊 imageMgr,若不
++       刷新會在 TileAnim::draw deref 壞指標而崩潰(對應 drawTile 的 graphics-mode TODO)。*/
++    tileset = xu4.config->tileset();
++
+     //Scratchpad needs to be re-inited if we rescale...
+     if (animated)
+     {
+@@ -75,6 +80,11 @@ void TileView::drawTile(const MapTile &mapTile, int x, int y) {
+     ASSERT(x < columns, "x value of %d out of range", x);
+     ASSERT(y < rows, "y value of %d out of range", y);
+ 
++    /* U4 繁中化:防護 —— graphics 切換邊界個別 tile 可能 image/anim 未就緒,
++       跳過以避免 deref 崩潰(對應原始碼 drawTile 的 graphics-mode TODO)。*/
++    if (!tile || !tile->getImage())
++        return;
++
+     // draw the tile to the screen
+     if (tile->getAnim()) {
+         // First, create our animated version of the tile
 diff --git a/src/u4.h b/src/u4.h
 index 767f30a..57f22e4 100644
 --- a/src/u4.h
