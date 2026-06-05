@@ -51,6 +51,13 @@ def collect():
     d = json.load(open("dumps/vendor_bilingual.json", encoding="utf-8"))
     for e in d["strings"]:
         add(e["en"], e["zh"])
+    # castle:Lord British 城堡對白(discourse_castle.cpp,自 avatar.exe 載入)
+    try:
+        d = json.load(open("dumps/castle_bilingual.json", encoding="utf-8"))
+        for e in d["strings"]:
+            add(e["en"], e["zh"])
+    except FileNotFoundError:
+        pass
     # UI(intro 選單 / 角色創建 / prompt,TextView::textAt)
     try:
         d = json.load(open("dumps/ui_bilingual.json", encoding="utf-8"))

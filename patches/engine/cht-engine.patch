@@ -22,6 +22,57 @@ index 6736af1..ac16f35 100644
          creature.cpp \
          death.cpp \
          debug.cpp \
+diff --git a/src/discourse_castle.cpp b/src/discourse_castle.cpp
+index cdd6837..56c0966 100644
+--- a/src/discourse_castle.cpp
++++ b/src/discourse_castle.cpp
+@@ -3,6 +3,7 @@
+  */
+ 
+ #include <cstring>
++#include "cht.h"
+ #include "context.h"
+ #include "party.h"
+ #include "u4.h"
+@@ -103,6 +104,10 @@ static void lordBritishCheckLevels() {
+  * Print text with pauses after paragraphs and/or complete pages.
+  */
+ static void messageParts(const char* text) {
++    /* U4 繁中化:Lord British 城堡對白整段查表(命中用中文,再分頁)。 */
++    const char* zh = chtLookup(text, (int) strlen(text));
++    if (zh) text = zh;
++
+     const char* cp = text;
+     int lines = 0;
+     int len;
+@@ -308,21 +313,20 @@ static void runTalkLordBritish(const U4TalkLordBritish* lb)
+     musicPlay(MUSIC_RULEBRIT);
+ 
+     if (c->saveGame->lbintro) {
+-        static const char* welcome = "\n\n\nLord British says:  Welcome ";
+-
++        /* U4 繁中化:歡迎詞改為內嵌 %s 的整段 format,讓 chtLookup 命中可譯。 */
+         switch (party->size()) {
+             case 1:
+-                message("%s%s!\n", welcome, pcName.c_str());
++                message("\n\n\nLord British says:  Welcome %s!\n", pcName.c_str());
+                 soundSpeakLine(VOICE_LB, LINE_WELCOME, true);
+                 break;
+             case 2:
+-                message("%s%s and thee also %s!\n", welcome, pcName.c_str(),
+-                        party->member(1)->getName());
++                message("\n\n\nLord British says:  Welcome %s and thee also %s!\n",
++                        pcName.c_str(), party->member(1)->getName());
+                 soundSpeakLine(VOICE_LB, LINE_WELCOME, true);
+                 break;
+             default:
+-                message("%s%s and thy worthy Adventurers!\n",
+-                        welcome, pcName.c_str());
++                message("\n\n\nLord British says:  Welcome %s and thy worthy Adventurers!\n",
++                        pcName.c_str());
+                 soundSpeakLine(VOICE_LB, LINE_WELCOME_ADV, true);
+                 break;
+         }
 diff --git a/src/event.cpp b/src/event.cpp
 index 0bef0c9..7accd7f 100644
 --- a/src/event.cpp
