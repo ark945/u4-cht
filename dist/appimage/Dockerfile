@@ -20,10 +20,13 @@ WORKDIR /build/xu4
 RUN cd src/faun && ./configure --no_flac && make && make DESTDIR=/usr install
 RUN ./configure --allegro && make download && make
 
-# appimagetool(--appimage-extract-and-run 免 FUSE)
+# appimagetool + 靜態 runtime(自帶 FUSE,現代桌面不需系統 libfuse2)
 RUN curl -sSL -o /usr/local/bin/appimagetool \
       https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage \
- && chmod +x /usr/local/bin/appimagetool
+ && chmod +x /usr/local/bin/appimagetool \
+ && curl -sSL -o /usr/local/bin/runtime-x86_64 \
+      https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64 \
+ && chmod +x /usr/local/bin/runtime-x86_64
 
 # 組 AppDir
 RUN set -e; \
@@ -49,7 +52,9 @@ RUN set -e; \
     done; \
     ls $AD/usr/lib | wc -l
 
-# 打包 AppImage
-RUN cd /build && ARCH=x86_64 appimagetool --appimage-extract-and-run AppDir u4-cht-x86_64.AppImage 2>&1 | tail -5
+# 打包 AppImage(用靜態 runtime,免系統 libfuse2)
+RUN cd /build && ARCH=x86_64 appimagetool --appimage-extract-and-run \
+      --runtime-file /usr/local/bin/runtime-x86_64 \
+      AppDir u4-cht-x86_64.AppImage 2>&1 | tail -5
 
 CMD ["bash","-c","cp /build/u4-cht-x86_64.AppImage /out/ && echo done"]

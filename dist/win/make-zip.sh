@@ -21,7 +21,14 @@ BAT
 unix2dos "$D/run.bat" 2>/dev/null || sed -i 's/$/\r/' "$D/run.bat"
 cat > "$D/README.txt" <<'TXT'
 Ultima IV: Quest of the Avatar 繁體中文版 (xu4 640x400 2x)
-雙擊 run.bat 開始。字形:set U4CHT_FONT=firefly 或 kai 後執行 run.bat。
+
+雙擊 run.bat 開始。
+
+遊戲中熱鍵:
+  F2 = 切換 EGA / VGA 美術
+  F3 = 切換解析度(tile 物理放大)
+
+字形切換:執行前 set U4CHT_FONT=firefly(或 kai),省略=Noto。
 TXT
 ( cd "$(dirname "$D")" && zip -qr "$OUT" u4-cht-windows )
 echo "→ $OUT ($(du -h "$OUT" | cut -f1))"

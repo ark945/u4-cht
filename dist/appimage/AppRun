@@ -2,4 +2,6 @@
 HERE="$(dirname "$(readlink -f "$0")")"
 export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
 cd "$HERE/usr/share/u4-cht"
+# 遊戲中熱鍵:F2 = 切換 EGA/VGA 美術;F3 = 切換解析度(tile 物理放大)
+# 字形切換:啟動前 export U4CHT_FONT=firefly(或 kai),省略=Noto
 exec "$HERE/usr/bin/xu4" -s 2 --filter xBRZ "$@"
