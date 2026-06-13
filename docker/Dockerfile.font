@@ -1,0 +1,8 @@
+# CJK 點陣字 atlas builder:Noto(預設)+ AR PL 宋/楷(firefly/kai 替代字形)
+FROM python:3.11-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      fonts-noto-cjk fonts-arphic-bsmi00lp fonts-arphic-bkai00mp \
+ && pip install --no-cache-dir pillow \
+ && rm -rf /var/lib/apt/lists/*
+WORKDIR /work
+ENTRYPOINT ["bash"]

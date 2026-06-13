@@ -25,13 +25,17 @@ import struct
 from PIL import Image, ImageFont, ImageDraw
 
 JSON_FILES = ["talk_bilingual", "stringtable_bilingual",
-              "hardcoded_strings", "vendor_bilingual"]
+              "hardcoded_strings", "vendor_bilingual",
+              "castle_bilingual", "ui_bilingual"]
 
 
 def collect_codepoints():
     cps = set()
     for f in JSON_FILES:
-        d = json.load(open(f"dumps/{f}.json", encoding="utf-8"))
+        path = f"dumps/{f}.json"
+        if not os.path.exists(path):
+            continue
+        d = json.load(open(path, encoding="utf-8"))
 
         def walk(o):
             if isinstance(o, dict):

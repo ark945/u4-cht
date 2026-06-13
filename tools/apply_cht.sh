@@ -17,10 +17,22 @@ git -C "$XU4" apply --check "$ROOT/patches/engine/cht-engine.patch" 2>/dev/null 
   || patch -d "$XU4" -p1 < "$ROOT/patches/engine/cht-engine.patch"
 
 echo "[3/3] 產生並安裝資產"
-if [ ! -f "$ROOT/assets/cjk_font.bin" ]; then
-  python3 "$ROOT/tools/build_cjk_font.py" \
-    --font /usr/share/fonts/opentype/noto/NotoSansCJK-Medium.ttc --index 3 --size 14 --cell 16 \
+# 三套 CJK atlas:Noto(預設)+ AR PL 宋(firefly)/ 楷(kai)。字集涵蓋 6 份雙語表
+# (含 castle/ui),新增字後須刪 .bin 重建。重建環境見 docker/Dockerfile.font。
+NOTO=/usr/share/fonts/opentype/noto/NotoSansCJK-Medium.ttc
+BSMI=/usr/share/fonts/truetype/arphic-bsmi00lp/bsmi00lp.ttf
+BKAI=/usr/share/fonts/truetype/arphic-bkai00mp/bkai00mp.ttf
+if [ ! -f "$ROOT/assets/cjk_font.bin" ] && [ -f "$NOTO" ]; then
+  python3 "$ROOT/tools/build_cjk_font.py" --font "$NOTO" --index 3 --size 14 --cell 16 \
     --out "$ROOT/assets/cjk_font.bin" --preview "$ROOT/assets/cjk_preview.png"
+fi
+if [ ! -f "$ROOT/assets/cjk_font_firefly.bin" ] && [ -f "$BSMI" ]; then
+  python3 "$ROOT/tools/build_cjk_font.py" --font "$BSMI" --size 14 --cell 16 \
+    --out "$ROOT/assets/cjk_font_firefly.bin"
+fi
+if [ ! -f "$ROOT/assets/cjk_font_kai.bin" ] && [ -f "$BKAI" ]; then
+  python3 "$ROOT/tools/build_cjk_font.py" --font "$BKAI" --size 14 --cell 16 \
+    --out "$ROOT/assets/cjk_font_kai.bin"
 fi
 [ -f "$ROOT/assets/u4_cht.tab" ] || python3 "$ROOT/tools/build_lookup.py" --out "$ROOT/assets/u4_cht.tab"
 # 字形切換:ship Noto(預設)+ Firefly 宋體/楷體(若已建);runtime env U4CHT_FONT 選用
