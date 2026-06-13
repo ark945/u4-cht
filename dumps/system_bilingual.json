@@ -103,6 +103,70 @@
     {
       "en": "\n%s %cElectrified%c!\n",
       "zh": "\n%s %c觸電%c!\n"
+    },
+    {
+      "en": "\nYour Interest:\n",
+      "zh": "\n汝欲問:\n"
+    },
+    {
+      "en": "Bye.\n",
+      "zh": "再會。\n"
+    },
+    {
+      "en": "%s turns away!\n",
+      "zh": "%s別過臉去!\n"
+    },
+    {
+      "en": "%s says: On guard! Fool!\n",
+      "zh": "%s喝道:看招吧,蠢貨!\n"
+    },
+    {
+      "en": "\n%s\n\nYou say: ",
+      "zh": "\n%s\n\n汝答道: "
+    },
+    {
+      "en": "You see %s\n",
+      "zh": "汝見到%s\n"
+    },
+    {
+      "en": "%s says: I am %s\n",
+      "zh": "%s說道:吾名為%s\n"
+    },
+    {
+      "en": "How much? ",
+      "zh": "多少? "
+    },
+    {
+      "en": "%s says: Oh Thank thee! I shall never forget thy kindness!\n",
+      "zh": "%s說道:啊,感謝汝!吾永不忘汝之恩情!\n"
+    },
+    {
+      "en": "\n\nThou hast not that much gold!\n",
+      "zh": "\n\n汝沒那麼多金幣!\n"
+    },
+    {
+      "en": "%s says: I do not need thy gold.  Keep it!\n",
+      "zh": "%s說道:吾不需汝的金幣,留著吧!\n"
+    },
+    {
+      "en": "I am honored to join thee!\n",
+      "zh": "吾深感榮幸,願加入汝!\n"
+    },
+    {
+      "en": "Thou art not %s enough for me to join thee.\n",
+      "zh": "汝尚不夠%s,吾無法加入汝。\n"
+    },
+    {
+      "en": "%s says: I cannot join thee.\n",
+      "zh": "%s說道:吾無法加入汝。\n"
+    },
+    {
+      "en": "That I cannot\nhelp thee with.\n",
+      "zh": "此事吾\n無能為力。\n"
+    },
+    {
+      "en": "\nThy thoughts are pure. ",
+      "zh": "\n汝之心念純淨。 "
     }
   ]
 }
