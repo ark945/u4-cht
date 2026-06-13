@@ -82,7 +82,8 @@ Ultima IV 當年有 EGA(16 色)與後來社群重製的 VGA(256 色)兩套美術
 10. [技術架構](#技術架構)
 11. [資料抽取成果](#資料抽取成果)
 12. [Roadmap](#roadmap)
-13. [License & Credits](#credits)
+13. [譯名政策(不完全沿用精訊)](#naming)
+14. [License & Credits](#credits)
 
 ---
 
@@ -238,7 +239,20 @@ B. GUI / 選單(.txf SDF 紋理字,uint16 碼位)
 
 **已完成**:四源全譯(talk 256 / stringtable 114 / 硬編 318 / vendor 278)→ CJK 灰階字庫(Noto / Firefly / Kai)→ H1–H8 文字 hook → 640×400 全美術 2x → 標題動畫 → `F2` EGA/VGA 即時切換 → `F3` 解析度 → AppImage + Windows 打包 → **Lord British 城堡對白**(LCB 二樓,載自 `avatar.exe`)→ **vendor 買賣面板**(武器/防具名 + 標題,經 `getName` 查表;`config.b` 受 Boron UCS-2 限制改在存取端中文化)。
 
-**未來方向**:戰鬥畫面用詞校對、裝備/物品面板標籤(火把/寶石/鑰匙…)、`.txf` GUI 字(存檔瀏覽器)SDF 子集烘焙、譯文潤飾(文白比例與專名一致性)。
+**未來方向**:戰鬥畫面用詞校對、`.txf` GUI 字(存檔瀏覽器)SDF 子集烘焙、譯文潤飾(文白比例與專名一致性)。
+
+---
+
+<a name="naming"></a>
+## 🏷️ 譯名政策 —— 混合採用,**不完全沿用精訊官方手冊**
+
+本專案參考 1985 年**精訊資訊《創世紀IV》官方繁體中文手冊**(已逐頁 OCR 轉錄於 [`docs/manual/`](docs/manual/)),但**刻意不全盤套用**其譯名,改採「**混合**」策略:
+
+- **採精訊** —— 官方譯名較完整、貼合原意、或更具年代記憶價值時(如 Dagger **短劍**、Flaming Oil **焚油**、Mace **釘頭鎚**、Plate **鎧甲**、Fighter **鬥士**、Tinker **工匠**、Shepherd **牧羊人**、Nightshade **龍葵**、Mandrake **曼陀羅**)。
+- **保留現譯** —— 官方舊譯今日讀來生硬或易誤解時(如 Paladin **聖騎士**〔非「武士」,避免與 samurai 混〕、Ranger **遊俠**〔非「流浪者」〕、Crossbow **弩**〔非「弓箭槍」〕、Staff **法杖**、Sword **長劍**)。
+- **數值完全忠於原版** —— 武器傷害 / 防具防禦 / 法術 MP 經比對與原版 `AVATAR.EXE` **逐位元組相同**;法術試劑組合與《魔法之書》一致。
+
+> 原則:**正確性 / 直觀 > 純懷舊**。精訊譯本是 1985 年的時代產物,部分用詞在今日語感下偏離原意;故僅在官方譯名同等或更佳時採用。完整逐項決定與理由見 [`docs/manual/術語對照.md`](docs/manual/術語對照.md)。八德與三原則沿用台灣《創世紀聖者之書》體系。
 
 ---
 
@@ -250,6 +264,7 @@ B. GUI / 選單(.txf SDF 紋理字,uint16 碼位)
 - **原始遊戲**:*Ultima IV: Quest of the Avatar* © 1985 Origin Systems / Richard Garriott。EA / Origin 多年前已將其釋出為 **freeware**,可於 [The Ultima Codex](https://ultimacodex.com/) 等處公開取得;本 repo 內的 tileset 展示圖由原版資料解碼渲染,僅供說明。
 - **VGA 美術**:U4 Upgrade / Remastered 社群專案。
 - **前例經驗**:[wicanr2/u6-cht](https://github.com/wicanr2/u6-cht) 的 load-time 替換架構與字型 pipeline。
-- **譯名體系**:台灣《創世紀聖者之書》。
+- **譯名體系**:八德沿用台灣《創世紀聖者之書》;名詞採「精訊官方手冊 + 現代直觀」混合策略,**不完全沿用精訊**(見[譯名政策](#naming)與 [`docs/manual/術語對照.md`](docs/manual/術語對照.md))。
+- **官方手冊**:精訊資訊《創世紀IV》1985 繁中手冊(已 OCR 轉錄於 [`docs/manual/`](docs/manual/),供譯名/數值校對)。
 
 > repo 納管:中文化工具 / 雙語表 / Docker / 文件 / tileset 展示圖。完整可玩遊戲請依 [`SETUP.md`](SETUP.md) 用 `make download` 自行取得 freeware 資料重建。
