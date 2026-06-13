@@ -237,9 +237,9 @@ B. GUI / 選單(.txf SDF 紋理字,uint16 碼位)
 <a name="roadmap"></a>
 ## 🗺️ Roadmap
 
-**已完成**:四源全譯(talk 256 / stringtable 114 / 硬編 318 / vendor 278)→ CJK 灰階字庫(Noto / Firefly / Kai)→ H1–H8 文字 hook → 640×400 全美術 2x → 標題動畫 → `F2` EGA/VGA 即時切換 → `F3` 解析度 → AppImage + Windows 打包 → **Lord British 城堡對白**(LCB 二樓,載自 `avatar.exe`)→ **vendor 買賣面板**(武器/防具名 + 標題,經 `getName` 查表;`config.b` 受 Boron UCS-2 限制改在存取端中文化)。
+**已完成**:四源全譯(talk 256 / stringtable 114 / 硬編 318 / vendor 278)→ CJK 灰階字庫(Noto / Firefly / Kai)→ H1–H8 文字 hook → 640×400 全美術 2x → 標題動畫 → `F2` EGA/VGA 即時切換 → `F3` 解析度 → AppImage + Windows 打包 → **Lord British 城堡對白**(LCB 二樓,載自 `avatar.exe`)→ **vendor 買賣面板**(武器/防具名 + 標題,`getName` 查表)→ **一般 NPC 對話系統全面中文化**(遇見/look 描述/代名詞 他她它/吾名為/汝欲問/告別/給金幣/加入回應 — DS_LOOK・DS_PRONOUN hook)→ **職業/怪物/物品/方向/系統/戰鬥/聖壇/Codex 訊息**補譯 → 精訊官方手冊 OCR 參考 + **混合譯名政策**(見 [譯名政策](#naming))。**全域多行掃描:screenMessage 路徑 0 殘留英文。**
 
-**未來方向**:戰鬥畫面用詞校對、`.txf` GUI 字(存檔瀏覽器)SDF 子集烘焙、譯文潤飾(文白比例與專名一致性)。
+**未來方向**:角色面板數值縮寫(STR/DEX/INT…)與吉普賽問卷框架(版面需重排)、3 個待定怪物名(Hydra/Reaper/Zorn)、`.txf` GUI 字(存檔瀏覽器)SDF 子集烘焙、譯文潤飾。
 
 ---
 
