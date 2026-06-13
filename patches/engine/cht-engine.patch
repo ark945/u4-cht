@@ -215,7 +215,7 @@ index 0bef0c9..f919e16 100644
          return false;
      }
 diff --git a/src/game.cpp b/src/game.cpp
-index 5c359b0..7e0ce3c 100644
+index 5c359b0..f673f85 100644
 --- a/src/game.cpp
 +++ b/src/game.cpp
 @@ -418,6 +418,57 @@ void gameUpdateScreen() {
@@ -276,6 +276,15 @@ index 5c359b0..7e0ce3c 100644
  void GameController::setMap(Map *map, bool saveLocation, const Portal *portal, TurnController *turnCompleter) {
      int viewMode;
      LocationContext context;
+@@ -3452,7 +3503,7 @@ showMixturesSuper(int page = 0) {
+ 
+     const Spell *s = getSpell(i + 13 * page);
+     int line = i + 8;
+-    screenTextAt(2, line, "%s", s->name);
++    screenTextAt(2, line, "%s", spellGetName(i + 13 * page));  // U4 繁中化:官方法術名
+ 
+     screenTextAt(6, line, "%3u", c->saveGame->mixtures[i + 13 * page]);
+ 
 diff --git a/src/game.h b/src/game.h
 index 69ca236..9c1a8d2 100644
 --- a/src/game.h
@@ -1027,6 +1036,27 @@ index 396af65..4b9c6e3 100644
  void screenSetLayer(int layer, void (*renderFunc)(ScreenState*, void*),
                      void* data);
  bool screenLayerUsed(int layer);
+diff --git a/src/spell.cpp b/src/spell.cpp
+index 977cedf..0bc6f6c 100644
+--- a/src/spell.cpp
++++ b/src/spell.cpp
+@@ -165,6 +165,16 @@ void Ingredients::multiply(int batches) {
+ const char *spellGetName(unsigned int spell) {
+     ASSERT(spell < N_SPELLS, "invalid spell: %d", spell);
+ 
++    /* U4 繁中化:官方法術名(精訊手冊《魔法之書》)。用本地表避開全域查表
++     * 對 Kill/Open/Light 等常用字的碰撞。順序對齊 spells[] A–Z。 */
++    static const char* const spellNameZh[] = {
++        "甦醒術","飛遁術","治療術","解場術","力場術","火球術","月門傳送術","療傷術",
++        "冰球術","亂魂術","妖殺術","神光術","魔擊術","終止術","開啟術","護身術",
++        "縮時術","起死回生術","催眠術","裂地術","趕鬼術","靈視術","召風術","脫離術",
++        "飛昇術","沈降術"
++    };
++    if (spell < sizeof(spellNameZh)/sizeof(spellNameZh[0]))
++        return spellNameZh[spell];
+     return spells[spell].name;
+ }
+ 
 diff --git a/src/stats.cpp b/src/stats.cpp
 index d2c466b..9235af3 100644
 --- a/src/stats.cpp

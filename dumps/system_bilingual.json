@@ -203,6 +203,26 @@
     {
       "en": "\nSpell: ",
       "zh": "\n法術: "
+    },
+    {
+      "en": "None Mixed!\n",
+      "zh": "未調製!\n"
+    },
+    {
+      "en": "Not Enough MP!\n",
+      "zh": "法力不足!\n"
+    },
+    {
+      "en": "Combat only!\nFailed!\n",
+      "zh": "僅限戰鬥!\n失敗!\n"
+    },
+    {
+      "en": "Dungeon only!\nFailed!\n",
+      "zh": "僅限地牢!\n失敗!\n"
+    },
+    {
+      "en": "Outdoors only!\nFailed!\n",
+      "zh": "僅限戶外!\n失敗!\n"
     }
   ]
 }
