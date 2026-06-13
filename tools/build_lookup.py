@@ -66,12 +66,15 @@ def collect():
     except FileNotFoundError:
         pass
     # config(武器/防具名 + stats 標題,TextView::textAt / setTitle)
-    try:
-        d = json.load(open("dumps/config_bilingual.json", encoding="utf-8"))
-        for e in d["strings"]:
-            add(e["en"], e["zh"])
-    except FileNotFoundError:
-        pass
+    # names(職業/試劑/美德/物品/方向)、creature(怪物名)、system(系統/戰鬥/面板訊息)
+    for src in ("config_bilingual", "names_bilingual",
+                "creature_bilingual", "system_bilingual"):
+        try:
+            d = json.load(open(f"dumps/{src}.json", encoding="utf-8"))
+            for e in d["strings"]:
+                add(e["en"], e["zh"])
+        except FileNotFoundError:
+            pass
     return pairs
 
 

@@ -1,0 +1,92 @@
+{
+  "strings": [
+    {
+      "en": "%2d Torches",
+      "zh": "%2d 火把"
+    },
+    {
+      "en": "%2d Gems",
+      "zh": "%2d 寶石"
+    },
+    {
+      "en": "%2d Keys",
+      "zh": "%2d 鑰匙"
+    },
+    {
+      "en": "%2d Sextants",
+      "zh": "%2d 六分儀"
+    },
+    {
+      "en": "Stones:%s",
+      "zh": "石塊:%s"
+    },
+    {
+      "en": "Runes:%s",
+      "zh": "符文:%s"
+    },
+    {
+      "en": "3 Part Key:%s",
+      "zh": "三部鑰:%s"
+    },
+    {
+      "en": "W:%s",
+      "zh": "武:%s"
+    },
+    {
+      "en": "A:%s",
+      "zh": "防:%s"
+    },
+    {
+      "en": "\n%cStarving!!!%c\n",
+      "zh": "\n%c餓壞了!!!%c\n"
+    },
+    {
+      "en": "\nAttacked by %s\n",
+      "zh": "\n遭 %s 突襲\n"
+    },
+    {
+      "en": "\nYou meet %s\n",
+      "zh": "\n汝遇見 %s\n"
+    },
+    {
+      "en": "Resting...\n",
+      "zh": "歇息中……\n"
+    },
+    {
+      "en": "Ambushed!\n",
+      "zh": "遭伏擊!\n"
+    },
+    {
+      "en": "Party Healed!\n",
+      "zh": "隊伍已療癒!\n"
+    },
+    {
+      "en": "No effect.\n",
+      "zh": "毫無效果。\n"
+    },
+    {
+      "en": "\nMorning!\n",
+      "zh": "\n天亮了!\n"
+    },
+    {
+      "en": "You enter the ancient shrine and sit before the altar...",
+      "zh": "汝步入古老聖壇,於祭壇前端坐……"
+    },
+    {
+      "en": "You approach\nthe ancient\nshrine...\n",
+      "zh": "汝走近\n那古老的\n聖壇……\n"
+    },
+    {
+      "en": "\nThe Altar Room of %s\n",
+      "zh": "\n%s 祭壇室\n"
+    },
+    {
+      "en": "%cPoison%c Trap!\n",
+      "zh": "%c毒%c陷阱!\n"
+    },
+    {
+      "en": "\n%s %cPoisoned%c!\n",
+      "zh": "\n%s %c中毒%c!\n"
+    }
+  ]
+}

@@ -1,0 +1,232 @@
+{
+  "strings": [
+    {
+      "en": "Mage",
+      "zh": "法師"
+    },
+    {
+      "en": "Bard",
+      "zh": "吟遊詩人"
+    },
+    {
+      "en": "Fighter",
+      "zh": "戰士"
+    },
+    {
+      "en": "Druid",
+      "zh": "德魯依"
+    },
+    {
+      "en": "Tinker",
+      "zh": "技工"
+    },
+    {
+      "en": "Paladin",
+      "zh": "聖騎士"
+    },
+    {
+      "en": "Ranger",
+      "zh": "遊俠"
+    },
+    {
+      "en": "Shepherd",
+      "zh": "牧人"
+    },
+    {
+      "en": "Sulfur Ash",
+      "zh": "硫磺灰"
+    },
+    {
+      "en": "Ginseng",
+      "zh": "人蔘"
+    },
+    {
+      "en": "Garlic",
+      "zh": "大蒜"
+    },
+    {
+      "en": "Spider Silk",
+      "zh": "蜘蛛絲"
+    },
+    {
+      "en": "Blood Moss",
+      "zh": "血苔"
+    },
+    {
+      "en": "Black Pearl",
+      "zh": "黑珍珠"
+    },
+    {
+      "en": "Nightshade",
+      "zh": "毒茄"
+    },
+    {
+      "en": "Mandrake",
+      "zh": "曼德拉草"
+    },
+    {
+      "en": "Honesty",
+      "zh": "誠實"
+    },
+    {
+      "en": "Compassion",
+      "zh": "慈悲"
+    },
+    {
+      "en": "Valor",
+      "zh": "勇敢"
+    },
+    {
+      "en": "Justice",
+      "zh": "正義"
+    },
+    {
+      "en": "Sacrifice",
+      "zh": "犧牲"
+    },
+    {
+      "en": "Honor",
+      "zh": "榮譽"
+    },
+    {
+      "en": "Spirituality",
+      "zh": "靈性"
+    },
+    {
+      "en": "Humility",
+      "zh": "謙卑"
+    },
+    {
+      "en": "Truth",
+      "zh": "真理"
+    },
+    {
+      "en": "Love",
+      "zh": "愛"
+    },
+    {
+      "en": "Courage",
+      "zh": "勇氣"
+    },
+    {
+      "en": "Truth and Love",
+      "zh": "真理與愛"
+    },
+    {
+      "en": "Love and Courage",
+      "zh": "愛與勇氣"
+    },
+    {
+      "en": "Courage and Truth",
+      "zh": "勇氣與真理"
+    },
+    {
+      "en": "Truth, Love and Courage",
+      "zh": "真理、愛與勇氣"
+    },
+    {
+      "en": "honest",
+      "zh": "誠實"
+    },
+    {
+      "en": "compassionate",
+      "zh": "慈悲"
+    },
+    {
+      "en": "valiant",
+      "zh": "勇敢"
+    },
+    {
+      "en": "just",
+      "zh": "正義"
+    },
+    {
+      "en": "sacrificial",
+      "zh": "犧牲"
+    },
+    {
+      "en": "honorable",
+      "zh": "榮譽"
+    },
+    {
+      "en": "spiritual",
+      "zh": "靈性"
+    },
+    {
+      "en": "humble",
+      "zh": "謙卑"
+    },
+    {
+      "en": "Blue",
+      "zh": "藍"
+    },
+    {
+      "en": "Yellow",
+      "zh": "黃"
+    },
+    {
+      "en": "Red",
+      "zh": "紅"
+    },
+    {
+      "en": "Green",
+      "zh": "綠"
+    },
+    {
+      "en": "Orange",
+      "zh": "橙"
+    },
+    {
+      "en": "Purple",
+      "zh": "紫"
+    },
+    {
+      "en": "White",
+      "zh": "白"
+    },
+    {
+      "en": "Black",
+      "zh": "黑"
+    },
+    {
+      "en": "Skull",
+      "zh": "骷髏"
+    },
+    {
+      "en": "Candle",
+      "zh": "蠟燭"
+    },
+    {
+      "en": "Book",
+      "zh": "典籍"
+    },
+    {
+      "en": "Bell",
+      "zh": "法鐘"
+    },
+    {
+      "en": "Horn",
+      "zh": "號角"
+    },
+    {
+      "en": "Wheel",
+      "zh": "船舵"
+    },
+    {
+      "en": "West",
+      "zh": "西"
+    },
+    {
+      "en": "North",
+      "zh": "北"
+    },
+    {
+      "en": "East",
+      "zh": "東"
+    },
+    {
+      "en": "South",
+      "zh": "南"
+    }
+  ]
+}

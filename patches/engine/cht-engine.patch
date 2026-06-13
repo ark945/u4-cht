@@ -61,6 +61,31 @@ index 5136bdc..2adcfe4 100644
  }
  
  static Armor* conf_armor(UThread* ut, int type, Armor* arm, UBlockIt& bi) {
+diff --git a/src/creature.cpp b/src/creature.cpp
+index 0c64297..7ac36ca 100644
+--- a/src/creature.cpp
++++ b/src/creature.cpp
+@@ -6,6 +6,7 @@
+ 
+ #include <cstring>
+ #include "combat.h"
++#include "cht.h"
+ #include "config.h"
+ #include "context.h"
+ #include "debug.h"
+@@ -48,7 +49,11 @@ Creature::Creature(const Creature* cproto) : Object(Object::CREATURE) {
+ }
+ 
+ const char* Creature::getName() const {
+-    return CSTR(name);
++    /* U4 繁中化:怪物/NPC 名查表("You meet a X" / 隊伍訊息);config.b 受
++     * Boron UCS-2 限制,改在此查表(英文→tab→UTF-8)。 */
++    const char* s = CSTR(name);
++    const char* zh = s ? chtLookup(s, (int) strlen(s)) : 0;
++    return zh ? zh : s;
+ }
+ 
+ bool Creature::isAttackable() const  {
 diff --git a/src/discourse_castle.cpp b/src/discourse_castle.cpp
 index cdd6837..56c0966 100644
 --- a/src/discourse_castle.cpp
@@ -545,6 +570,151 @@ index c21ef93..f0c1c6a 100644
          uint8_t r, g, b, a;
      };
  
+diff --git a/src/names.cpp b/src/names.cpp
+index 8807b88..9ea809d 100644
+--- a/src/names.cpp
++++ b/src/names.cpp
+@@ -2,26 +2,34 @@
+  * $Id$
+  */
+ 
++#include <cstring>
+ #include "names.h"
++#include "cht.h"      // U4 繁中化:職業/試劑/美德/物品/方向名查表
++
++/* chtLookup 命中回傳常駐指標;未命中回傳原英文。 */
++static inline const char* CHT(const char* s) {
++    const char* z = s ? chtLookup(s, (int) strlen(s)) : 0;
++    return z ? z : s;
++}
+ 
+ const char *getClassName(ClassType klass) {
+     switch (klass) {
+     case CLASS_MAGE:
+-        return "Mage";
++        return CHT("Mage");
+     case CLASS_BARD:
+-        return "Bard";
++        return CHT("Bard");
+     case CLASS_FIGHTER:
+-        return "Fighter";
++        return CHT("Fighter");
+     case CLASS_DRUID:
+-        return "Druid";
++        return CHT("Druid");
+     case CLASS_TINKER:
+-        return "Tinker";
++        return CHT("Tinker");
+     case CLASS_PALADIN:
+-        return "Paladin";
++        return CHT("Paladin");
+     case CLASS_RANGER:
+-        return "Ranger";
++        return CHT("Ranger");
+     case CLASS_SHEPHERD:
+-        return "Shepherd";
++        return CHT("Shepherd");
+     default:
+         return "???";
+     }
+@@ -35,7 +43,7 @@ const char *getReagentName(Reagent reagent) {
+     };
+ 
+     if (reagent < REAG_MAX)
+-        return reagentNames[reagent - REAG_ASH];
++        return CHT(reagentNames[reagent - REAG_ASH]);
+     else
+         return "???";
+ }
+@@ -48,19 +56,19 @@ const char *getVirtueName(Virtue virtue) {
+     };
+ 
+     if (virtue < 8)
+-        return virtueNames[virtue - VIRT_HONESTY];
++        return CHT(virtueNames[virtue - VIRT_HONESTY]);
+     else
+         return "???";
+ }
+ 
+ const char *getBaseVirtueName(int virtueMask) {
+-    if (virtueMask == VIRT_TRUTH)           return "Truth";
+-    else if (virtueMask == VIRT_LOVE)       return "Love";
+-    else if (virtueMask == VIRT_COURAGE)    return "Courage";
+-    else if (virtueMask == (VIRT_TRUTH | VIRT_LOVE)) return "Truth and Love";
+-    else if (virtueMask == (VIRT_LOVE | VIRT_COURAGE)) return "Love and Courage";
+-    else if (virtueMask == (VIRT_COURAGE | VIRT_TRUTH)) return "Courage and Truth";
+-    else if (virtueMask == (VIRT_TRUTH | VIRT_LOVE | VIRT_COURAGE)) return "Truth, Love and Courage";
++    if (virtueMask == VIRT_TRUTH)           return CHT("Truth");
++    else if (virtueMask == VIRT_LOVE)       return CHT("Love");
++    else if (virtueMask == VIRT_COURAGE)    return CHT("Courage");
++    else if (virtueMask == (VIRT_TRUTH | VIRT_LOVE)) return CHT("Truth and Love");
++    else if (virtueMask == (VIRT_LOVE | VIRT_COURAGE)) return CHT("Love and Courage");
++    else if (virtueMask == (VIRT_COURAGE | VIRT_TRUTH)) return CHT("Courage and Truth");
++    else if (virtueMask == (VIRT_TRUTH | VIRT_LOVE | VIRT_COURAGE)) return CHT("Truth, Love and Courage");
+     else return "???";
+ }
+ 
+@@ -91,7 +99,7 @@ const char *getVirtueAdjective(Virtue virtue) {
+     };
+ 
+     if (virtue < 8)
+-        return virtueAdjectives[virtue - VIRT_HONESTY];
++        return CHT(virtueAdjectives[virtue - VIRT_HONESTY]);
+     else
+         return "???";
+ }
+@@ -104,7 +112,7 @@ const char *getStoneName(Virtue virtue) {
+     };
+ 
+     if (virtue < VIRT_MAX)
+-        return virtueNames[virtue - VIRT_HONESTY];
++        return CHT(virtueNames[virtue - VIRT_HONESTY]);
+     else
+         return "???";
+ }
+@@ -112,23 +120,23 @@ const char *getStoneName(Virtue virtue) {
+ const char *getItemName(Item item) {
+     switch (item) {
+     case ITEM_SKULL:
+-        return "Skull";
++        return CHT("Skull");
+     case ITEM_CANDLE:
+-        return "Candle";
++        return CHT("Candle");
+     case ITEM_BOOK:
+-        return "Book";
++        return CHT("Book");
+     case ITEM_BELL:
+-        return "Bell";
++        return CHT("Bell");
+     case ITEM_KEY_C:
+-        return "Courage";
++        return CHT("Courage");
+     case ITEM_KEY_L:
+-        return "Love";
++        return CHT("Love");
+     case ITEM_KEY_T:
+-        return "Truth";
++        return CHT("Truth");
+     case ITEM_HORN:
+-        return "Horn";
++        return CHT("Horn");
+     case ITEM_WHEEL:
+-        return "Wheel";
++        return CHT("Wheel");
+     default:
+         return "???";
+     }
+@@ -140,8 +148,7 @@ const char *getDirectionName(Direction dir) {
+     };
+ 
+     if (dir >= DIR_WEST && dir <= DIR_SOUTH)
+-        return directionNames[dir - DIR_WEST];
++        return CHT(directionNames[dir - DIR_WEST]);
+     else
+         return "???";
+ }
+-
 diff --git a/src/screen.cpp b/src/screen.cpp
 index 46d51bd..3f4fab8 100644
 --- a/src/screen.cpp
@@ -826,7 +996,7 @@ index d2c466b..9235af3 100644
  }
  
 diff --git a/src/textview.cpp b/src/textview.cpp
-index eb6fcc0..8b051af 100644
+index eb6fcc0..b5e0191 100644
 --- a/src/textview.cpp
 +++ b/src/textview.cpp
 @@ -3,6 +3,7 @@
@@ -900,7 +1070,19 @@ index eb6fcc0..8b051af 100644
      int ch;
      while ((ch = *text++)) {
          switch (ch) {
-@@ -203,6 +253,9 @@ void TextView::textAtFmt(int x, int y, const char *fmt, ...) {
+@@ -192,6 +242,11 @@ void TextView::textAtFmt(int x, int y, const char *fmt, ...) {
+     char buffer[512];
+     va_list args;
+ 
++    /* U4 繁中化:先查 format 字串(如 "%2d Torches" → "%2d 火把"),
++     * 中文 format 與英文 %d/%s/%c 同序,引數照常代入(對齊 screenMessage)。 */
++    const char* zhFmt = chtLookup(fmt, (int) strlen(fmt));
++    if (zhFmt) fmt = zhFmt;
++
+     va_start(args, fmt);
+     vsnprintf(buffer, sizeof(buffer), fmt, args);
+     va_end(args);
+@@ -203,6 +258,9 @@ void TextView::textAtFmt(int x, int y, const char *fmt, ...) {
   * Draw text with a single character highlighted.
   */
  void TextView::textAtKey(int x, int y, const char *text, int keyIndex) {
