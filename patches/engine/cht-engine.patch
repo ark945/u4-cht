@@ -299,10 +299,10 @@ index 0bef0c9..f919e16 100644
          return false;
      }
 diff --git a/src/game.cpp b/src/game.cpp
-index 5c359b0..25215fb 100644
+index 5c359b0..024a9c5 100644
 --- a/src/game.cpp
 +++ b/src/game.cpp
-@@ -418,6 +418,65 @@ void gameUpdateScreen() {
+@@ -418,6 +418,71 @@ void gameUpdateScreen() {
      }
  }
  
@@ -360,6 +360,12 @@ index 5c359b0..25215fb 100644
 +    }
 +    xu4.game->mapArea.reinit();     /* mapArea.tileset 重新指向新 config 的 tileset */
 +
++    /* U4 繁中化:音樂跟主題切換 —— 各主題用自己 config 的音樂(EGA/VGA=DOS、
++       FM Towns=CD 音軌;無自訂音樂的主題沿用父模組 DOS 音樂)。musicStop 重置
++       currentTrack,musicPlayLocale 才會從新 config 重載當前 map 的音樂。 */
++    musicStop();
++    musicPlayLocale();
++
 +    screenMessage("\n%s\n", themes[cur].label);
 +    gameUpdateScreen();
 +    return true;
@@ -368,7 +374,7 @@ index 5c359b0..25215fb 100644
  void GameController::setMap(Map *map, bool saveLocation, const Portal *portal, TurnController *turnCompleter) {
      int viewMode;
      LocationContext context;
-@@ -3452,7 +3511,7 @@ showMixturesSuper(int page = 0) {
+@@ -3452,7 +3517,7 @@ showMixturesSuper(int page = 0) {
  
      const Spell *s = getSpell(i + 13 * page);
      int line = i + 8;
