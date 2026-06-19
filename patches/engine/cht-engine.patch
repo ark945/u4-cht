@@ -165,7 +165,7 @@ index cdd6837..56c0966 100644
                  break;
          }
 diff --git a/src/discourse_tlk.cpp b/src/discourse_tlk.cpp
-index 01f961c..251ef42 100644
+index 01f961c..1f852f2 100644
 --- a/src/discourse_tlk.cpp
 +++ b/src/discourse_tlk.cpp
 @@ -1,5 +1,6 @@
@@ -175,7 +175,64 @@ index 01f961c..251ef42 100644
  #include "game.h"
  #include "party.h"
  #include "screen.h"
-@@ -377,10 +378,23 @@ static const char* U4Talk_dialogue(TalkState* ts, int value, const char* input)
+@@ -12,7 +13,8 @@ enum DialogueString {
+     DS_KEYWORD,
+     DS_QUESTION,
+     DS_ANSWER_Y,
+-    DS_ANSWER_N
++    DS_ANSWER_N,
++    DS_TOPICS       /* U4 繁中化:回傳該 NPC 2 個專屬主題的英文(供輸入提示) */
+ };
+ 
+ enum TalkOpcode {
+@@ -86,6 +88,13 @@ static void runTalkDialogue(TalkFunc func, TalkState* ts)
+ 
+     while (xu4.stage == StagePlay) {
+         message("\nYour Interest:\n");
++        /* U4 繁中化:列出該 NPC 專屬主題的英文,讓玩家知道該輸入什麼
++           (標準關鍵字 name/job/health 仍靠探索,保留手感)。 */
++        {
++            const char* topics = func(ts, DS_TOPICS, NULL);
++            if (topics && *topics)
++                message("(可問 %s)\n", topics);
++        }
+         input = gameGetInput(16);
+         screenCrLf();
+         screenCrLf();
+@@ -346,6 +355,32 @@ static const char* U4Talk_dialogue(TalkState* ts, int value, const char* input)
+     if (tlk->askAfter == TRIGGER) \
+         ts->nextOp = OP_PAUSE_ASK;
+ 
++    if (value == DS_TOPICS) {
++        /* U4 繁中化:回傳該 NPC 2 個專屬主題的英文,供「汝欲問」輸入提示。
++           關鍵字比對只看前 4 字母,提示也以多裁到 4 字(夠玩家輸入)。 */
++        static char buf[40];
++        buf[0] = '\0';
++        for (int i = 0; i < 2; ++i) {
++            uint16_t off = i ? tlk->topic2 : tlk->topic1;
++            if (! off)
++                continue;
++            const char* t = tlk->strings + off;
++            if (! *t)
++                continue;
++            if (buf[0])
++                strncat(buf, " / ", sizeof(buf) - strlen(buf) - 1);
++            char word[8];
++            int n = 0;
++            while (t[n] && t[n] != ' ' && n < 4) {
++                word[n] = (t[n] >= 'A' && t[n] <= 'Z') ? t[n] + 32 : t[n];
++                ++n;
++            }
++            word[n] = '\0';
++            strncat(buf, word, sizeof(buf) - strlen(buf) - 1);
++        }
++        return buf[0] ? buf : NULL;
++    }
++
+     if (value == DS_KEYWORD) {
+         const char* topic;
+ 
+@@ -377,10 +412,23 @@ static const char* U4Talk_dialogue(TalkState* ts, int value, const char* input)
          switch(value) {
              case DS_NAME:
                  return USTR(name);
