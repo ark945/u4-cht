@@ -50,10 +50,15 @@ description: 把同一款經典遊戲(此處 Ultima IV)各家移植版的 tilese
 - 檔案:`SHAPE.DAT`(24576)=tileset、`FONT.DAT`(8064)、`CARD1-3.MSX`(吉普賽卡)、
   `II1X-7X.MSX`/`RUNE*.MSX`/`ENDPIC.MSX`(intro/結局,~19460/11620,SCREEN 圖)、
   `U4MAP.BIN`/`TALKDATA.BIN` 等 game data。`mcopy -i x.dsk ::FILE .` 取檔。
-- **未解**:`SHAPE.DAT` 24576 = 192×128(4bpp 16×16)或 256×96。標準 row-major
-  chunky 4bpp(高/低 nibble 兩序)解出**噪訊** → MSX VRAM 排列另有玄機
-  (待試:Y-interlace、quadrant 8×8 切、planar、或 SCREEN5 line 交錯)。調色盤用
-  MSX2 SCREEN5 標準 16 色。**下一步**:對照已知 U4 tile 0(深水雙色橫紋)逐 byte 反推 layout。
+- **像素格式已確認**:`II1X.MSX`(19460 = 256×152×4bpp + **4-byte header**)從 offset 4
+  以 **row-major chunky 4bpp(高 nibble 先)** + MSX2 SCREEN5 標準 16 色解出**可辨識
+  風景圖**(intro 樹/丘陵)→ **MSX intro 畫面可抽取**(II*/RUNE*/ENDPIC/CARD* 同法,
+  各自算 W×H 與 header)。略有色噪 → 可能 Y-interlace(偶/奇行分開)未處理。
+- **`SHAPE.DAT` tile 排列未解**(像素格式同上,但 tile 在檔內排法不同):24576 已試
+  ①連續 16×16×128B(高/低 nibble) ②planar 4bpp ③3-plane 96B ④256×192 整圖切格 —
+  **皆噪訊**。**下一步**:先處理 intro 的 Y-interlace 確認完整 MSX layout,再回頭試
+  SHAPE.DAT 的 row-interleave / VRAM-stride(256 寬 stride 下 16×16 tile 行距 128B)排法;
+  或對照 II*.MSX 內若含 tile 樣本反推。tile 數 192(非 256)。
 
 ### X68000 — 🔴 最難(未動)
 - 媒體:`.hdm`(**Human68k FS**,`7z`/`mtools` **讀不出**)→ 需 Human68k 專屬讀碟工具。
