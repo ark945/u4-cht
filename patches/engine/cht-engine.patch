@@ -503,7 +503,7 @@ index fd2d981..a309fe5 100644
      uint8_t fixup;              /**< a routine to do miscellaneous fixes to the image */
      Image *image;               /**< the image we're describing */
 diff --git a/src/intro.cpp b/src/intro.cpp
-index acdf1f7..88cbc8b 100644
+index acdf1f7..e297619 100644
 --- a/src/intro.cpp
 +++ b/src/intro.cpp
 @@ -20,6 +20,7 @@
@@ -538,7 +538,33 @@ index acdf1f7..88cbc8b 100644
                          vertoffset);
  }
  
-@@ -764,7 +768,7 @@ void IntroController::updateScreen() {
+@@ -721,7 +725,24 @@ void IntroController::drawCard(int card, int x, int y) {
+     };
+     ASSERT(card < 8, "invalid card: %d", card);
+ 
+-    backgroundArea.draw(xu4.config->intern(cardNames[card]), x, y);
++    Symbol sym = xu4.config->intern(cardNames[card]);
++    backgroundArea.draw(sym, x, y);
++
++    /* U4 繁中化:疊中文德目名於卡底橫幅(對 EGA/VGA 卡牌皆有效,免改美術)。 */
++    static const char* const virtueZh[] = {
++        "誠實", "慈悲", "勇氣", "正義", "犧牲", "榮譽", "靈性", "謙卑"
++    };
++    const SubImage* csub = NULL;
++    xu4.imageMgr->imageInfo(sym, &csub);
++    if (csub) {
++        int cw = csub->width, ch = csub->height;
++        int plateH = CHAR_HEIGHT + 14;                 // 加高以完全蓋住原英文橫幅
++        int py = y + ch - plateH - 3;                  // 卡底橫幅
++        int nameW = 2 * CHAR_WIDTH;                     // 德目名皆 2 字
++        int nx = x + (cw - nameW) / 2;
++        xu4.screenImage->fillRect(x + 4, py, cw - 8, plateH, 16, 12, 22);
++        screenDrawCJKPixel(virtueZh[card], nx, py + (plateH - CHAR_HEIGHT) / 2);
++    }
+ }
+ 
+ /**
+@@ -764,7 +785,7 @@ void IntroController::updateScreen() {
      case INTRO_MENU:
          // draw the extended background for all option screens
          backgroundArea.draw(BKGD_INTRO);
@@ -547,7 +573,7 @@ index acdf1f7..88cbc8b 100644
  
          // if there is an error message to display, show it
          if (xu4.errorMessage)
-@@ -780,7 +784,7 @@ void IntroController::updateScreen() {
+@@ -780,7 +801,7 @@ void IntroController::updateScreen() {
              EventHandler::wait_msecs(3000);
              // clear the screen again
              backgroundArea.draw(BKGD_INTRO);
@@ -556,7 +582,7 @@ index acdf1f7..88cbc8b 100644
          }
  
          menuArea.textAt(1,  1, "In another world, in a time to come.");
-@@ -808,7 +812,7 @@ void IntroController::updateScreen() {
+@@ -808,7 +829,7 @@ void IntroController::updateScreen() {
  void IntroController::initiateNewGame() {
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_INTRO);
@@ -565,7 +591,7 @@ index acdf1f7..88cbc8b 100644
  
      // display name prompt and read name from keyboard
      menuArea.textAt(3, 3, "By what name shalt thou be known");
-@@ -831,7 +835,7 @@ void IntroController::initiateNewGame() {
+@@ -831,7 +852,7 @@ void IntroController::initiateNewGame() {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_INTRO);
@@ -574,7 +600,7 @@ index acdf1f7..88cbc8b 100644
  
      // display sex prompt and read sex from keyboard
      menuArea.textAt(3, 3, "Art thou Male or Female?");
-@@ -1103,7 +1107,7 @@ void IntroController::journeyOnward() {
+@@ -1103,7 +1124,7 @@ void IntroController::journeyOnward() {
  void IntroController::about() {
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_INTRO);
@@ -583,7 +609,7 @@ index acdf1f7..88cbc8b 100644
  
      screenHideCursor();
      menuArea.textAtFmt(14, 1, "XU4 %s", VERSION);
-@@ -1125,7 +1129,9 @@ void IntroController::about() {
+@@ -1125,7 +1146,9 @@ void IntroController::about() {
   * Shows text in the question area.
   */
  void IntroController::showText(const string &text) {
@@ -594,7 +620,7 @@ index acdf1f7..88cbc8b 100644
      int lineNo = 0;
  
      questionArea.clear();
-@@ -1270,7 +1276,7 @@ void IntroController::updateConfMenu(MenuEvent &event) {
+@@ -1270,7 +1293,7 @@ void IntroController::updateConfMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -603,7 +629,7 @@ index acdf1f7..88cbc8b 100644
  }
  
  void IntroController::updateVideoMenu(MenuEvent &event) {
-@@ -1307,7 +1313,7 @@ void IntroController::updateVideoMenu(MenuEvent &event) {
+@@ -1307,7 +1330,7 @@ void IntroController::updateVideoMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -612,7 +638,7 @@ index acdf1f7..88cbc8b 100644
  }
  
  void IntroController::updateGfxMenu(MenuEvent &event)
-@@ -1327,7 +1333,7 @@ void IntroController::updateGfxMenu(MenuEvent &event)
+@@ -1327,7 +1350,7 @@ void IntroController::updateGfxMenu(MenuEvent &event)
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -621,7 +647,7 @@ index acdf1f7..88cbc8b 100644
  }
  
  void IntroController::updateSoundMenu(MenuEvent &event) {
-@@ -1361,7 +1367,7 @@ void IntroController::updateSoundMenu(MenuEvent &event) {
+@@ -1361,7 +1384,7 @@ void IntroController::updateSoundMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -630,7 +656,7 @@ index acdf1f7..88cbc8b 100644
  }
  
  void IntroController::updateInputMenu(MenuEvent &event) {
-@@ -1389,7 +1395,7 @@ void IntroController::updateInputMenu(MenuEvent &event) {
+@@ -1389,7 +1412,7 @@ void IntroController::updateInputMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -639,7 +665,7 @@ index acdf1f7..88cbc8b 100644
  
      // after drawing the menu, extra menu text can be added here
      extendedMenuArea.textAt(0, 5, "Mouse Options:");
-@@ -1420,7 +1426,7 @@ void IntroController::updateSpeedMenu(MenuEvent &event) {
+@@ -1420,7 +1443,7 @@ void IntroController::updateSpeedMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -648,7 +674,7 @@ index acdf1f7..88cbc8b 100644
  }
  
  void IntroController::updateGameplayMenu(MenuEvent &event) {
-@@ -1444,7 +1450,7 @@ void IntroController::updateGameplayMenu(MenuEvent &event) {
+@@ -1444,7 +1467,7 @@ void IntroController::updateGameplayMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -657,7 +683,7 @@ index acdf1f7..88cbc8b 100644
  }
  
  void IntroController::updateInterfaceMenu(MenuEvent &event) {
-@@ -1468,7 +1474,7 @@ void IntroController::updateInterfaceMenu(MenuEvent &event) {
+@@ -1468,7 +1491,7 @@ void IntroController::updateInterfaceMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -666,7 +692,7 @@ index acdf1f7..88cbc8b 100644
  
      // after drawing the menu, extra menu text can be added here
      extendedMenuArea.textAt(2, 3, "  (Open, Jimmy, etc.)");
-@@ -1703,8 +1709,8 @@ void IntroController::initTitles()
+@@ -1703,8 +1726,8 @@ void IntroController::initTitles()
  void IntroController::addTitle(int x, int y, int w, int h, AnimType method, int delay, int duration)
  {
      AnimElement data = {
@@ -677,7 +703,7 @@ index acdf1f7..88cbc8b 100644
          method,             // render method
          0,                  // animStep
          0,                  // animStepMax
-@@ -1777,8 +1783,8 @@ void IntroController::getTitleSourceData()
+@@ -1777,8 +1800,8 @@ void IntroController::getTitleSourceData()
                          color = info->image->setColor(255, (y == 2 ? 250 : 255), blue[y-1]);
                      }
                      AnimPlot plot = {
@@ -688,7 +714,7 @@ index acdf1f7..88cbc8b 100644
                          uint8_t(color.r),
                          uint8_t(color.g),
                          uint8_t(color.b),
-@@ -1800,15 +1806,15 @@ void IntroController::getTitleSourceData()
+@@ -1800,15 +1823,15 @@ void IntroController::getTitleSourceData()
              {
                  for (int y=0; y < titles[i].rh; y++)
                  {
@@ -707,7 +733,7 @@ index acdf1f7..88cbc8b 100644
                                  uint8_t(r), uint8_t(g), uint8_t(b), uint8_t(a)
                              };
                              titles[i].plotData.push_back(plot);
-@@ -1904,12 +1910,12 @@ bool IntroController::updateTitle()
+@@ -1904,12 +1927,12 @@ bool IntroController::updateTitle()
          {
              while (animStepTarget > title->animStep)
              {
@@ -882,7 +908,7 @@ index 8807b88..9ea809d 100644
  }
 -
 diff --git a/src/screen.cpp b/src/screen.cpp
-index 46d51bd..5ebacb4 100644
+index 46d51bd..f12d643 100644
 --- a/src/screen.cpp
 +++ b/src/screen.cpp
 @@ -25,6 +25,7 @@
@@ -1023,7 +1049,7 @@ index 46d51bd..5ebacb4 100644
      va_list args;
      va_start(args, fmt);
      buflen = vsnprintf(buffer, MsgBufferSize, fmt, args);
-@@ -446,7 +497,102 @@ void screenMessageCenter(const char* text, int newlines) {
+@@ -446,7 +497,124 @@ void screenMessageCenter(const char* text, int newlines) {
      screenMessageN(start, cp - start);
  }
  
@@ -1078,6 +1104,28 @@ index 46d51bd..5ebacb4 100644
 +    }
 +}
 +
++/* U4 繁中化:把 UTF-8 中文字串畫在絕對像素 (px,py)(每字寬 CHAR_WIDTH)。
++ * 供 intro 吉普賽卡牌疊德目名等需精確落點處使用(公開)。 */
++void screenDrawCJKPixel(const char* s, int px, int py) {
++    const unsigned char* p = (const unsigned char*) s;
++    int adv = 0;
++    while (*p) {
++        unsigned char b = *p;
++        uint32_t cp; int n;
++        if (b < 0x80)             { cp = b;        n = 1; }
++        else if ((b >> 5) == 0x6) { cp = b & 0x1F; n = 2; }
++        else if ((b >> 4) == 0xE) { cp = b & 0x0F; n = 3; }
++        else if ((b >> 3) == 0x1E){ cp = b & 0x07; n = 4; }
++        else { ++p; continue; }
++        for (int k = 1; k < n; ++k) {
++            if ((p[k] & 0xC0) != 0x80) { n = k; break; }
++            cp = (cp << 6) | (p[k] & 0x3F);
++        }
++        p += n;
++        if (cp >= 0x80) { cjkBlitPx(cp, px + adv, py); adv += CHAR_WIDTH; }
++    }
++}
++
 +/* U4 繁中化:把已翻譯的 UTF-8 中文字串渲染到文字區(CJK-aware,行距 2)。 */
 +static void screenMessageCJK(const char* s) {
 +    const int colCount = TEXT_AREA_W;
@@ -1126,7 +1174,7 @@ index 46d51bd..5ebacb4 100644
      bool colorize = xu4.settings->enhancements &&
                      xu4.settings->enhancementsOptions.textColorization;
      const int colCount = TEXT_AREA_W;
-@@ -850,7 +996,44 @@ static void screenUploadCursor(Screen* sp, uint32_t stex) {
+@@ -850,7 +1018,44 @@ static void screenUploadCursor(Screen* sp, uint32_t stex) {
                      &cimg);
  }
  
@@ -1172,14 +1220,15 @@ index 46d51bd..5ebacb4 100644
      void* gpu = xu4.gpu;
      ScreenState* ss = &sp->state;
 diff --git a/src/screen.h b/src/screen.h
-index 396af65..4b9c6e3 100644
+index 396af65..8dc24ea 100644
 --- a/src/screen.h
 +++ b/src/screen.h
-@@ -109,6 +109,7 @@ void screenInit(int layerCount);
+@@ -109,6 +109,8 @@ void screenInit(int layerCount);
  void screenRefreshTimerInit(void);
  void screenDelete(void);
  void screenReInit(void);
 +bool screenCycleScale(void);    /* U4 繁中化:F3 循環 game resolution(scale),tile 物理放大 */
++void screenDrawCJKPixel(const char* s, int px, int py);  /* U4 繁中化:像素座標畫 CJK 字串 */
  void screenSetLayer(int layer, void (*renderFunc)(ScreenState*, void*),
                      void* data);
  bool screenLayerUsed(int layer);
