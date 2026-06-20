@@ -71,9 +71,22 @@ description: 把同一款經典遊戲(此處 Ultima IV)各家移植版的 tilese
 - tileset:SHAPES(Apple II **高解析**,位元打包 6 色 + artifact),需專屬解碼。
 - 卡點:AppleCommander jar URL 要對版本(`1-9-0` 失效過,改 SourceForge 或 cppo/a2tools)。
 
-### Sega SMS / Amiga — ⏳ 未動
-- SMS:`.sms` ROM,VDP tile(planar 4bpp)+ palette;音樂 PSG。
-- Amiga:`7z` 解 → planar bitplane tile;音樂 MOD/samples。
+### Sega Master System(SMS,非 Genesis)— 🟡 格式已解、圖形區已定位
+> 媒體資料夾名標 `sega-genesis` 但實為 `.sms`(512KB Master System ROM,`TMR SEGA`
+> @0x7FF0)。`7z x` 出 ROM,複製本機。
+- **tile 格式**:SMS VDP tile = **8×8 4bpp planar**,每 row 4 byte(plane0..3,weight
+  1/2/4/8),MSB=左,32B/tile。`tools/sms/sms_tiles.py`(overview 掃 + page 放大)。
+- **圖形區已定位**:整 ROM overview 多為 code/壓縮(帶狀噪訊);**raw tile 區約
+  `0x40A00–0x41900`**(~4KB=128 個 8×8 tile),page 解出**清楚 U4 地形**(磚牆、水/草
+  交界 = 藍+綠)→ 確認格式對、tile 未壓縮。
+- **殘餘**:① 完整圖形區範圍(僅 128 個 8×8 = 32 個 16×16,不足 256,需找其他 bank 或
+  判斷是否壓縮其餘) ② palette:SMS CRAM 32 byte(2 pal×16 色,`--BBGGRR` 6-bit)需在
+  ROM 找 ③ 8×8 → U4 16×16 組裝(4 子 tile)+ 對齊 xu4 256-tile 序。
+- **方法論**:flat ROM 無 FS → 整 ROM 當 tile strip overview 找「圖形區 vs code 區」
+  外觀差異,再放大定位;raw 區直接 8×8 planar 解。
+
+### Amiga — ⏳ 未動
+- `7z` 解 → planar bitplane tile(Amiga 5-6 plane);音樂 MOD/samples。
 
 ## Headless / 容器雷(必踩)
 
