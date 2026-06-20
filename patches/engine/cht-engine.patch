@@ -1666,10 +1666,10 @@ index 767f30a..3f6abe4 100644
  /* text area (in character units) */
  #define TEXT_AREA_X 24
 diff --git a/src/xu4.cpp b/src/xu4.cpp
-index 6a01ed5..2c8be42 100644
+index 6a01ed5..afba495 100644
 --- a/src/xu4.cpp
 +++ b/src/xu4.cpp
-@@ -349,6 +349,14 @@ static void servicesReset(XU4GameServices* gs) {
+@@ -349,8 +349,36 @@ static void servicesReset(XU4GameServices* gs) {
  
  XU4GameServices xu4;
  
@@ -1680,7 +1680,29 @@ index 6a01ed5..2c8be42 100644
 +// macOS 26.5.1 一開即崩)。含此標頭會把下面的 main 改名為 _al_mangled_main,真正的
 +// main(建立 NSApplication、另起執行緒呼叫 _al_mangled_main)由 -lallegro_main 提供。
 +#include <allegro5/allegro.h>
++#include <mach-o/dyld.h>   // _NSGetExecutablePath:讓 .app 直接當主程式時自己定位資料夾
++#include <unistd.h>        // chdir
 +#endif
  
  int main(int argc, char *argv[]) {
++#ifdef __APPLE__
++    // .app 雙擊時 cwd 為 /,且本程式可直接當 CFBundleExecutable(不靠 launch 腳本)。
++    // 依執行檔自身路徑 chdir 到資料夾,讓 xu4 找得到 ultima4.zip / *.mod / 字型:
++    // 優先 <exe>/../Resources/share(標準 .app 結構),退而求其次用執行檔所在目錄。
++    {
++        char ep[4096]; uint32_t epsz = sizeof(ep);
++        if (_NSGetExecutablePath(ep, &epsz) == 0) {
++            char* sl = strrchr(ep, '/');
++            if (sl) {
++                *sl = '\0';
++                char share[4200];
++                snprintf(share, sizeof(share), "%s/../Resources/share", ep);
++                if (chdir(share) != 0)
++                    (void) chdir(ep);
++            }
++        }
++    }
++#endif
  #if defined(MACOSX)
+     osxInit(argv[0]);
+ #endif
