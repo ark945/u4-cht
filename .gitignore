@@ -42,3 +42,12 @@ __pycache__/
 tools/*/emu_work/
 tools/*/lr_work/
 materals/_extracted/amiga_work/
+
+# ymfm 外部 library(BSD,build.sh 於 docker clone)+ render 產物
+tools/x68000/ymfm/ymfm*.h
+tools/x68000/ymfm/ymfm*.cpp
+tools/x68000/ymfm/ymfm*.ipp
+tools/x68000/ymfm/render
+tools/x68000/ymfm/*.wav
+tools/x68000/ymfm/*_events.txt
+tools/x68000/ymfm/*.png
