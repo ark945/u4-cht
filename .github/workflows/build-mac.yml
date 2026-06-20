@@ -78,8 +78,15 @@ jobs:
           cp "$GITHUB_WORKSPACE/cht/patches/mac/sys_coreaudio.c" src/faun/
           perl -0pi -e 's/(#include "sys_wasapi.c"\n)(#else\n#error "Unsupported system")/$1#elif defined(__APPLE__)\n#include "sys_coreaudio.c"\n$2/' src/faun/faun.c
           grep -q 'sys_coreaudio.c' src/faun/faun.c   # 確認 include 鏈已加 __APPLE__ 分支
+          # faun.c 無條件用 timespec 版 timeout API(MsgTime + tmsg_setTimespec/popTimespec),
+          # 但上游只為非-Apple POSIX 定義 MsgTime,且 popTimespec 用 macOS 缺的 sem_timedwait。
+          # 補:__APPLE__ 定義 MsgTime=struct timespec;popTimespec 改用 dispatch 號誌 +
+          # dispatch_walltime(setTimespec 走 POSIX clock_gettime 路徑,macOS 可用,免改)。
+          perl -pi -e 's/(typedef dispatch_semaphore_t Semaphore;)/$1\ntypedef struct timespec MsgTime;/' src/faun/support/tmsg.c
+          perl -0pi -e 's/#else\n    int r;\n\n    r = sem_timedwait\(&mp->reader, ts\);/#elif defined(__APPLE__)\n    if (dispatch_semaphore_wait(mp->reader, dispatch_walltime(ts, 0)))\n        return 1;\n#else\n    int r;\n\n    r = sem_timedwait(&mp->reader, ts);/' src/faun/support/tmsg.c
+          grep -q 'dispatch_walltime' src/faun/support/tmsg.c   # 確認 timespec patch 生效
           ( cd src/faun && ./configure --no_flac --static && \
-            make libfaun.a OPT="-DUSE_LOAD_MEM -DUSE_SFX_GEN -DTMSG_WAIT_MS -I$BREW/include" && \
+            make libfaun.a OPT="-DUSE_LOAD_MEM -DUSE_SFX_GEN -I$BREW/include" && \
             sudo make install )
           # ---- xu4 本體:頂層 Makefile 在 Darwin 會選壞掉的 Makefile.macosx(舊 SDL 版),
           # 改用 Linux 的 src/Makefile(平台中性,讀 make.config UI=allegro)。faun 改靜態 →
