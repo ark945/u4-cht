@@ -1,0 +1,13 @@
+{
+  "_meta": {
+    "source": "city cityType symbol(module/Ultima-IV/*.b 的 city type:)",
+    "note": "進城訊息 portal.cpp 'Enter %s!' 的 %s 型別字;經 portal.cpp 自行 chtLookup 後代入。towne 為古字拼法,非 town。",
+    "translation": {"status": "translated", "date": "2026-06-20"}
+  },
+  "strings": [
+    {"en": "castle", "zh": "城堡"},
+    {"en": "towne", "zh": "城鎮"},
+    {"en": "village", "zh": "村莊"},
+    {"en": "ruins", "zh": "廢墟"}
+  ]
+}

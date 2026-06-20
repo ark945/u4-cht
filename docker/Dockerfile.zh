@@ -17,8 +17,12 @@ RUN git clone https://git.code.sf.net/p/urlan/boron/code /tmp/boron \
  && make DESTDIR=/usr install \
  && make DESTDIR=/usr install-dev
 
-# 破 COPY 快取:改原始碼 / 資產後以 --build-arg CACHEBUST=<新值> 強制重編
+# 破 COPY 快取:改原始碼 / 資產後以 --build-arg CACHEBUST=<新值> 強制重編。
+# 注意:裸 `ARG` 後接 `COPY` 在 BuildKit 下不一定會讓 COPY 失效(實測會沿用舊層、
+# ship 到舊 binary)→ 必須插一個「引用 $CACHEBUST 的 RUN」斷開快取鏈,COPY 才會重跑。
+# 真要保險可整包 `docker build --no-cache`。
 ARG CACHEBUST=1
+RUN echo "cachebust=$CACHEBUST"
 COPY . /build/xu4
 WORKDIR /build/xu4
 
@@ -26,6 +30,8 @@ WORKDIR /build/xu4
 RUN cd src/faun && ./configure --no_flac && make && make DESTDIR=/usr install
 
 # Allegro 後端 configure → 抓資料 → build 二進位 + 模組
-RUN ./configure --allegro && make download && make
+# 注意:頂層 `make` 不遞迴 src(會 "Nothing to be done"),且 COPY 可能帶入 host 舊 .o /
+# 別後端編的 .o → 必須 clean 後明確 `make -C src` 才會用 Allegro 設定重編出正確 binary。
+RUN ./configure --allegro && make download && make -C src clean && make
 
 CMD ["/build/xu4/src/xu4"]

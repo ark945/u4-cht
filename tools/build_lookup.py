@@ -74,7 +74,8 @@ def collect():
     # config(武器/防具名 + stats 標題,TextView::textAt / setTitle)
     # names(職業/試劑/美德/物品/方向)、creature(怪物名)、system(系統/戰鬥/面板訊息)
     for src in ("config_bilingual", "names_bilingual",
-                "creature_bilingual", "system_bilingual"):
+                "creature_bilingual", "system_bilingual",
+                "location_types"):     # 進城型別字 castle/towne/village/ruins
         try:
             d = json.load(open(f"dumps/{src}.json", encoding="utf-8"))
             for e in d["strings"]:

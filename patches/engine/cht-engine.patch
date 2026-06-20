@@ -924,6 +924,32 @@ index 8807b88..9ea809d 100644
          return "???";
  }
 -
+diff --git a/src/portal.cpp b/src/portal.cpp
+index 119aca3..8c22e70 100644
+--- a/src/portal.cpp
++++ b/src/portal.cpp
+@@ -3,6 +3,7 @@
+  */
+ 
+ #include "portal.h"
++#include "cht.h"      // U4 繁中化:型別字 chtLookup
+ 
+ #include "city.h"
+ #include "config.h"
+@@ -89,7 +90,12 @@ int usePortalAt(Location *location, const Coords& coords, PortalTriggerAction ac
+             case Map::CITY:
+                 {
+                     City *city = dynamic_cast<City*>(destination);
+-                    screenMessage("Enter %s!\n\n", city->cityTypeStr());
++                    /* U4 繁中化:型別字(castle/towne/village/ruins)是 %s 引數,
++                       螢幕翻譯只動格式字串,故先把型別字自行 chtLookup 成中文,
++                       否則會顯示「進入 castle!」。 */
++                    const char* tstr = city->cityTypeStr();
++                    const char* tzh = chtLookup(tstr, (int) strlen(tstr));
++                    screenMessage("Enter %s!\n\n", tzh ? tzh : tstr);
+                     screenMessageCenter(city->getName(), 2);
+                 }
+                 break;
 diff --git a/src/screen.cpp b/src/screen.cpp
 index 46d51bd..f12d643 100644
 --- a/src/screen.cpp

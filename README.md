@@ -62,6 +62,28 @@ Ultima IV 當年有 EGA(16 色)與後來社群重製的 VGA(256 色)兩套美術
 
 *獸人、蝙蝠、巨蛇、飛龍、骷髏、石像鬼、漂浮的眼魔⋯⋯ 從 ankh 聖符記到月相,1983 的想像力盡在其中。(由原版 `SHAPES.EGA` / `shapes.vga` 解碼渲染,工具見 [`tools/render_tilesheet.py`](tools/render_tilesheet.py)。)*
 
+### 不只兩個時代 —— 一場跨平台的考古
+
+EGA 與 VGA 只是開始。U4 在 1985 之後被移植到太多機器,每一台都有自己的一套美術:
+1990 年日本的 **FM Towns** 版奢侈地用上 16-bit 直色與 CD 紅皮書配樂、Pony Canyon 的
+**MSX2** 磁碟、SHARP **X68000** 的硬碟映像、世嘉 **Master System** 卡帶、**Amiga** 的
+五層點陣⋯⋯ 那些畫風大多數台灣玩家當年根本沒機會看到。
+
+於是我們把光碟、磁碟、ROM 一張張挖開,逐一還原各版的 tileset,讓 `F2` 不只在兩個時代、
+而是在**整個移植史**之間循環:
+
+| 平台 | 年代 | 狀態 |
+|---|---|---|
+| EGA / VGA | 1985 / 社群重製 | ✅ 內建,隨時可切 |
+| **FM Towns** | 1990(日) | ✅ 完整主題(`ULTIMA4.TIL` 直色 tileset + CD 配樂 + intro);需自備光碟 |
+| MSX2 / X68000 | 1987 | 🔬 tileset 已解碼(MSX2 自訂 palette、X68000 用世界地圖當校色 oracle);整合中 |
+| Sega SMS / Amiga | — | 🔬 格式已逆向(SMS 走 VDP name-table、Amiga 走 LZW + planar) |
+
+> **引擎與資料分離**:各版美術與音樂是各家的版權資產,**不隨本專案散布**。你需自備
+> 各平台的原始媒體;repo 只提供解碼工具與模組定義,偵測到你放進去的資產才會把該主題
+> 加進 `F2` 循環,否則優雅跳過。每個平台的格式逆向過程都寫成了可複用的 skill
+> (`skills/u4-multiplatform-theme`、`skills/u4-msx2-extract`),給下一個想還原經典的人。
+
 > 另有 **`F3` 切換解析度**(tile 物理放大)與 **三套中文字形**(Noto 黑體 / Firefly 宋體 / Kai 楷體)。見 [遊戲中熱鍵](#hotkeys)。
 
 ---
@@ -259,11 +281,11 @@ B. GUI / 選單(.txf SDF 紋理字,uint16 碼位)
 <a name="roadmap"></a>
 ## 🗺️ Roadmap
 
-**已完成**:四源全譯(talk 256 / stringtable 114 / 硬編 318 / vendor 278)→ CJK 灰階字庫(Noto / Firefly / Kai)→ H1–H8 文字 hook → 640×400 全美術 2x → 標題動畫 → `F2` EGA/VGA 即時切換 → `F3` 解析度 → AppImage + Windows 打包 → **Lord British 城堡對白**(LCB 二樓,載自 `avatar.exe`)→ **vendor 買賣面板** → **一般 NPC 對話系統**(遇見/look/代名詞 他她它/吾名為/汝欲問/給金幣/加入 — DS_LOOK・DS_PRONOUN hook)→ **HUD 風向/方向**(screenTextAt format 查表)→ **角色面板數值縮寫**(力/敏/智/生/法…)→ **法術名**(甦醒術/神光術…本地表免碰撞)+ 施法錯誤 → **吉普賽角色創建**(框架 + 28 題道德兩難)→ **怪物名拍板**(半獸人/巨鼠/樹妖/巨口妖)→ 職業/物品/方向/系統/戰鬥/聖壇/Codex 訊息 → 精訊官方手冊 OCR 參考 + **混合譯名政策**(見 [譯名政策](#naming))→ **模組瀏覽器 GUI SDF 中文化**(自製單通道 SDF CJK 塞入 MSDF atlas + 引擎 UTF-8/稀疏碼位查找)→ **reagents 術語統一**(材料)。
+**已完成**:四源全譯(talk 256 / stringtable 114 / 硬編 318 / vendor 278)→ CJK 灰階字庫(Noto / Firefly / Kai)→ H1–H8 文字 hook → 640×400 全美術 2x → 標題動畫 → `F2` EGA/VGA 即時切換 → `F3` 解析度 → AppImage + Windows 打包 → **Lord British 城堡對白**(LCB 二樓,載自 `avatar.exe`)→ **vendor 買賣面板** → **一般 NPC 對話系統**(遇見/look/代名詞 他她它/吾名為/汝欲問/給金幣/加入 — DS_LOOK・DS_PRONOUN hook)→ **HUD 風向/方向**(screenTextAt format 查表)→ **角色面板數值縮寫**(力/敏/智/生/法…)→ **法術名**(甦醒術/神光術…本地表免碰撞)+ 施法錯誤 → **吉普賽角色創建**(框架 + 28 題道德兩難)→ **怪物名拍板**(半獸人/巨鼠/樹妖/巨口妖)→ 職業/物品/方向/系統/戰鬥/聖壇/Codex 訊息 → 精訊官方手冊 OCR 參考 + **混合譯名政策**(見 [譯名政策](#naming))→ **模組瀏覽器 GUI SDF 中文化**(自製單通道 SDF CJK 塞入 MSDF atlas + 引擎 UTF-8/稀疏碼位查找)→ **reagents 術語統一**(材料)→ **吉普賽問答卡德目名中文**(drawCard 疊字遮罩,EGA/VGA 通用,完全蓋住原英文橫幅)→ **進城型別字中文**(`進入城堡/城鎮/村莊/廢墟!`,portal 先 chtLookup 型別引數)→ **多平台美術主題**(`F2` 循環納入 **FM Towns** 完整主題:直色 tileset + CD 配樂 + intro;MSX2 / X68000 tileset 已解碼)。
 
-> **全路徑多行掃描:玩家可見文字 0 殘留英文**(僅吉普賽卡牌名行 positional fragment、卡圖烘進的德目美術字、GPL 授權聲明刻意保留)。
+> **全路徑多行掃描 + headless 實機巡查:玩家可見文字到處正確**(stats/對話/移動/裝備/風向/選單/進城 全中文;唯城內地名招牌等**美術 tile 內嵌字母**與 GPL 授權聲明刻意保留)。
 
-**未來方向**:吉普賽卡牌名行 positional fragment 版面重排、譯文潤飾(文白比例與專名一致性的全面校讀)。
+**未來方向**:多平台主題整合收尾(MSX2/X68000 模組 + F2、SMS/Amiga 需模擬器或續逆向)、城內地名招牌 letter-tile 中文化、戰鬥/存讀實機畫面驗證、譯文潤飾(文白比例與專名一致性的全面校讀)。
 
 ---
 
