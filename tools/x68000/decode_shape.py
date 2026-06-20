@@ -9,19 +9,20 @@ shape.pat(Program disk,212544 bytes),解成可檢視的 PNG 接觸表(sprite she
 -------------------------------------------------
 已確認:
   * 無壓縮(gzip 再壓比 ≈1.0;對照 .LWZ 的 Amiga 版才是 LZW 壓縮)。
-  * 4bpp / 16 色。X68000 GVRAM 原生即 16 色。
+  * **SWSHAPE.PAT = 16×16 2bpp(4 色),非 4bpp**。byte 自相關 lag=4(+8/12/16/…)
+    = 4 byte/row;16 寬 ÷ 4 byte = 2bpp;62464 ÷ 64 = 976 tiles。以 `twobpp` 模式
+    解出**乾淨可辨識 sprite**(人形/劍/箭,無倍增)。原先 chunky4(8 byte/row)
+    把 2 個真實 row 擠成 1 row → 才出現「8px 成對+水平錯位」的假象,已排除。
   * tile 基本尺寸 16×16(U4 標準 tile)。
-  * 以 chunky-4bpp(2 px/byte,row-major,8 byte/row,128 byte/tile)解碼時,
-    已能 dump 出可辨識字形(數字 "2"/"$"/"0"/"1" 清晰)→ 證明 pixel 資料就在裡面。
 
-TODO(尚未定到 pixel-perfect,本工具預設 chunky4 但保留 planar 模式):
-  * chunky4 模式下,字元呈「8px 寬成對 + 水平錯位」,強烈暗示真實排列可能是
-    **planar(4 個 bitplane 分離)** 而非 chunky nibble,或 tile 內部以 8×16
-    為單位再組成 16×16。需對 ult4.x / init.x 內的繪圖常式反組譯確認
-    plane 排列(連續 / word-interleaved)與 row stride。
-  * 調色盤未定:X68000 16 色 palette 應在 ult4.x / init.x 的初始化碼或
-    某 .PAT/.DAT 內(GVRAM palette 暫存器寫入)。目前用灰階占位,
-    可用 --palette 餵入外部 RGB 表(見下)。
+TODO(尚未定到 pixel-perfect):
+  * **palette 未定**:2bpp 每 tile 只用 4 色,X68000 透過 GVRAM palette 暫存器選
+    子盤。完整 16 色 palette 在 ult4.x / init.x 初始化碼(16-bit word GRB 5-5-5)
+    或某 .PAT/.DAT;掃描有多個候選(0x3c/0x3e/0x46…),需逐一套已知 tile 比對 pin。
+  * **哪個檔是 256 地圖 tile + tile 序**:SWSHAPE 頭幾個 tile 是人形非水/草地形,
+    需找 tile 0=水 的對齊點;`shape.pat`(212544)autocorr lag=18 結構不同(疑 portrait/
+    大圖),非地圖 tile。對齊 xu4 256-tile 序待定。
+  * 目前用灰階占位 palette,可用 --palette 餵 16*3 RGB 表。
 
 用法
 ----
@@ -90,7 +91,30 @@ def decode_tile_planar(data, off, tw, th, pal):
     return img
 
 
-DECODERS = {"chunky4": decode_tile_chunky4, "planar": decode_tile_planar}
+def decode_tile_2bpp(data, off, tw, th, pal):
+    """2bpp(4 色):4 px/byte,row-major,(tw//4) byte/row,(tw*th//4) byte/tile。
+
+    **這是 SWSHAPE.PAT 的正確格式**(byte 自相關 lag=4 = 4 byte/row;16 寬 → 2bpp;
+    62464/64 = 976 tiles)。agent 原以 chunky4(8 byte/row)解才出現「8px 成對+錯位」
+    —— 那是把 2 個真實 row 擠進 1 row + nibble 誤判。pal 只用前 4 色(idx 0-3)。
+    """
+    img = Image.new("RGB", (tw, th))
+    px = img.load()
+    row_bytes = tw // 4
+    for y in range(th):
+        for x in range(tw):
+            bi = off + y * row_bytes + x // 4
+            if bi >= len(data):
+                continue
+            b = data[bi]
+            shift = (3 - (x % 4)) * 2            # MSB-first,2 bit/px
+            px[x, y] = pal[(b >> shift) & 3]
+    return img
+
+
+DECODERS = {"twobpp": decode_tile_2bpp,
+            "chunky4": decode_tile_chunky4, "planar": decode_tile_planar}
+BYTES_PER_TILE = {"twobpp": 4, "chunky4": 2, "planar": 2}  # 分母:px→byte
 
 
 def parse_tile(s):
@@ -103,8 +127,8 @@ def main():
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("shape", help="SWSHAPE.PAT 或 shape.pat")
     ap.add_argument("-o", "--out", default="shape_sheet.png", help="輸出 PNG")
-    ap.add_argument("--mode", choices=DECODERS, default="chunky4",
-                    help="解碼模式(預設 chunky4;planar 待校正)")
+    ap.add_argument("--mode", choices=DECODERS, default="twobpp",
+                    help="解碼模式(預設 twobpp = SWSHAPE 正確格式;chunky4/planar 為對照)")
     ap.add_argument("--tile", default="16x16", help="tile 尺寸 WxH(預設 16x16)")
     ap.add_argument("--cols", type=int, default=16, help="接觸表每列 tile 數")
     ap.add_argument("--scale", type=int, default=3, help="輸出 nearest 放大倍率")
@@ -113,7 +137,7 @@ def main():
 
     data = open(args.shape, "rb").read()
     tw, th = parse_tile(args.tile)
-    bpt = (tw * th) // 2          # 4bpp = 0.5 byte/px,chunky 與 planar 同 size
+    bpt = (tw * th) // BYTES_PER_TILE[args.mode]   # 2bpp=tile/4、4bpp=tile/2
     pal = load_palette(args.palette)
     decode = DECODERS[args.mode]
 

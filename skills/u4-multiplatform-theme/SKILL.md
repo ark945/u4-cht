@@ -65,10 +65,14 @@ description: 把同一款經典遊戲(此處 Ultima IV)各家移植版的 tilese
 - **Human68k FS = 標準 FAT12**(boot sector 是 Hudson soft 自訂、無 BPB → mtools 報 "non DOS
   media";**自寫 reader 即解**:FAT@sec1-2、root@sec5-6、data@sec11=cluster2)。**64 檔全抽出**
   (Britannia 32 + Program 32)→ `materals/_extracted/x68000/files{,_prog}/`。**不需模擬器/專屬工具**。
-- **tileset = 4bpp packed/chunky,無壓縮**:`SWSHAPE.PAT` chunky-4bpp 解出可辨識字形;
-  Program disk 有 `shape.pat`(212KB 完整 tileset)、`FONT.PAT`(8×16 1bpp)、`MOON.PAT`、
-  `intro1-7.img`/`title.img`。`MAP.BIN` 已驗證 = 256×256 世界地圖(水=0 佔 34009)。
-  **殘餘**:tile stride 從 16px 微調 + 從 `ult4.x`/`init.x` 抽 16 色 palette → 產完整 tileset。
+- **tileset = `SWSHAPE.PAT` 16×16 2bpp(4 色),無壓縮**:byte 自相關 lag=4 = 4 byte/row;
+  16 寬 → **2bpp**(非 4bpp,agent 初判錯);`62464/64 = 976 tiles`;`decode_shape.py --mode
+  twobpp` 解出**乾淨可辨識 sprite**(人形/劍/箭,無倍增——chunky4 的「8px 成對」是把 2 真實
+  row 擠 1 row 的假象)。Program disk 另有 `shape.pat`(212KB,autocorr lag=18 結構不同,疑
+  portrait/大圖)、`FONT.PAT`、`MOON.PAT`、`intro1-7.img`/`title.img`。`MAP.BIN` 已驗證
+  = 256×256 世界地圖(水=0 佔 34009)。
+  **殘餘**:① palette(2bpp 每 tile 4 色,X68000 GVRAM 子盤;完整 16 色在 `ult4.x`/`init.x`
+  的 GRB 5-5-5 word,掃到多候選 0x3c/0x3e/0x46 需逐一 pin)② 找 tile 0=水 對齊點 + xu4 256 序。
 - **音樂(YODEL/BIG-X)檔案層可抽,免錄音**:`ult.mgd`(MML 曲譜)+ `ult.smp`(PCM)+
   `ult.efc`(音效)是磁碟獨立檔。轉現代格式需逆向 MGD 結構(較重),但抽檔本身已可。
 - **可行性:易-中**。**教訓**:「Human68k 讀不出」是 boot sector 無 BPB 的假象,底層仍 FAT12,
