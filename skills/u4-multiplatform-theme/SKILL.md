@@ -60,11 +60,30 @@ description: 把同一款經典遊戲(此處 Ultima IV)各家移植版的 tilese
 - **教訓**:先用全螢幕圖定像素格式,再用 byte 自相關量 tile/row stride(別盲猜維度);
   uniform-tile 正確+細節噪訊 = 格式對、tile 內序錯;無對角剪切 = stride 正確。
 
-### X68000 — 🔴 最難(未動)
-- 媒體:`.hdm`(**Human68k FS**,`7z`/`mtools` **讀不出**)→ 需 Human68k 專屬讀碟工具。
-- tileset:程式碼 `_loadshape`/`_shapebuf`/`_shapecount`(shape 從 `.dat` 載入,X68k 格式)。
-- **音樂**:`"Ultima music driver (C) YODEL & BIG-X"` = **自訂序列驅動**(非 CD-DA/標準 MDX)
-  → 幾乎只能**從 X68000 模擬器(px68k/XM6)跑遊戲錄製**,或逆向該驅動。建議最後做。
+### X68000 — 🟢 recon 完成(意外最可做!FS+圖形已打通、音樂檔案層可抽)
+- 媒體:`Ultima IV [FD].zip` = 4 個 `.hdm`(2HD,1232 sec × 1024B);`[extras].zip` 只有 3 PDF 手冊。
+- **Human68k FS = 標準 FAT12**(boot sector 是 Hudson soft 自訂、無 BPB → mtools 報 "non DOS
+  media";**自寫 reader 即解**:FAT@sec1-2、root@sec5-6、data@sec11=cluster2)。**64 檔全抽出**
+  (Britannia 32 + Program 32)→ `materals/_extracted/x68000/files{,_prog}/`。**不需模擬器/專屬工具**。
+- **tileset = 4bpp packed/chunky,無壓縮**:`SWSHAPE.PAT` chunky-4bpp 解出可辨識字形;
+  Program disk 有 `shape.pat`(212KB 完整 tileset)、`FONT.PAT`(8×16 1bpp)、`MOON.PAT`、
+  `intro1-7.img`/`title.img`。`MAP.BIN` 已驗證 = 256×256 世界地圖(水=0 佔 34009)。
+  **殘餘**:tile stride 從 16px 微調 + 從 `ult4.x`/`init.x` 抽 16 色 palette → 產完整 tileset。
+- **音樂(YODEL/BIG-X)檔案層可抽,免錄音**:`ult.mgd`(MML 曲譜)+ `ult.smp`(PCM)+
+  `ult.efc`(音效)是磁碟獨立檔。轉現代格式需逆向 MGD 結構(較重),但抽檔本身已可。
+- **可行性:易-中**。**教訓**:「Human68k 讀不出」是 boot sector 無 BPB 的假象,底層仍 FAT12,
+  自寫 reader 即破——別被 mtools 的 "non DOS media" 嚇退。
+
+### Amiga — 🟡 recon 完成(卡點單一:LWZ/LZW,xu4 有現成 decoder)
+- `7z` 解 `ultima4_amiga_win.7z` = GamesNostalgia WHDLoad 包(Psygore 1988 Origin 官方版),
+  遊戲資料**已解包在硬碟映像目錄,不需破 .adf**:`.../data/ultmapp/`。主程式 `data/avatar`
+  = Amiga Hunk 執行檔(magic `0x000003F3`)。
+- **tileset `U4SH.LWZ` = LZW 壓縮**(高熵 0.96-1.0 確認;`CON*.BIN` combat 為未壓縮明文 tile index)。
+  標準 12-bit LZW 直套立即終止(開頭非 clear code)→ **需跳過 header**(開頭 BE16 疑為 dimension)。
+  **U4 PC 版 `SHAPES.EGZ` 同為 LZW,xu4 引擎已有 decoder 可參考** → bounded。解壓後才是 Amiga
+  planar bitplane(通常 5-plane/32 色,需再去交錯)。
+- 音樂:`mus[tbcdo].bin` + `snds.bin` = Origin 自訂格式(非 MOD),檔案層可抽、需逆向。
+- **可行性:中**(卡點單一明確;對中文化非必要,增值在 32 色圖)。
 
 ### Apple II(1985,原版)— ⏸ 跳過待回頭
 - 媒體:4× `.dsk`(DOS 3.3)。`ac -l disk.dsk`(AppleCommander)列 catalog;`ac -g` 取檔。
