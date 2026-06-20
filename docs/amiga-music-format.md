@@ -90,3 +90,10 @@ y = 音高),一眼就看出來:
 > 抽出的音樂屬版權資產,不入 repo;這裡只放解碼/合成工具與方法。相關:
 > [各平台音效抽取手記](audio-extraction.md)、X68000 的 FM 音樂走 YM2151,見
 > [YM2151 知識庫](ym2151-knowledge-base.md)(若已生成)。
+
+## 後續:取樣式合成嘗試
+
+`mus_synth_sample.py` 改用取樣當樂器(取代方波)+ 包絡 → 取樣式音色。但**原版樂器取樣
+不在 `mus*.bin`(純序列、無高熵段)**,也無獨立音樂取樣庫(只 `snds.bin` 是音效)→ 樂器
+取樣在 `snds.bin` 內或 `data/avatar` 執行檔,需再定位 + 對映 instrument→sample + Paula
+period 表才能保真。目前用 `snds.bin` 一段當通用樂器,是「取樣式」示範非原音色。
