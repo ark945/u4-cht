@@ -81,15 +81,16 @@ jobs:
           ( cd src/faun && ./configure --no_flac --static && \
             make libfaun.a OPT="-DUSE_LOAD_MEM -DUSE_SFX_GEN -DTMSG_WAIT_MS -I$BREW/include" && \
             sudo make install )
-          # ---- project.b:copr 把 macOS 當 unix → 移除 PulseAudio 連結(改 CoreAudio)、
-          # 補 brew/usr-local 標頭與庫路徑 + AudioToolbox framework。
-          perl -pi -e 's/%pulse-simple %pulse //g' project.b
-          perl -0pi -e "s{(include_from \[%src %src/lzw %src/support\]\n)}{\$1\tcflags \"-I/usr/local/include -I$BREW/include\"\n\tlflags \"-L/usr/local/lib -L$BREW/lib -framework AudioToolbox -framework CoreFoundation\"\n}" project.b
-          grep -q 'AudioToolbox' project.b            # 確認 framework/路徑已注入
-          # ---- xu4 本體 ----
+          # ---- xu4 本體:頂層 Makefile 在 Darwin 會選壞掉的 Makefile.macosx(舊 SDL 版),
+          # 改用 Linux 的 src/Makefile(平台中性,讀 make.config UI=allegro)。faun 改靜態 →
+          # 連結需自帶其相依:vorbis/ogg + OpenGL/AudioToolbox framework + brew/usr-local 路徑。
           ./configure --allegro
+          perl -pi -e "s{^CXXFLAGS=-Wall -I\. -Isupport}{CXXFLAGS=-Wall -I. -Isupport -I/usr/local/include -I$BREW/include}" src/Makefile
+          perl -pi -e 's{^LIBS=.*}{LIBS=\$(UILIBS) -lvorbisfile -lvorbis -logg -lpng -lz -framework OpenGL -framework AudioToolbox -framework CoreFoundation}' src/Makefile
+          perl -pi -e "s{^(-include \.\./make.config)}{\$1\nLDFLAGS+=-L/usr/local/lib -L$BREW/lib}" src/Makefile
+          grep -q 'AudioToolbox' src/Makefile         # 確認連結 patch 已注入
           make download
-          make
+          make MFILE_OS=Makefile
           test -x src/xu4
 
       - name: 組裝 Ultima4-cht.app + bundle dylib + 簽章
