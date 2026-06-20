@@ -71,7 +71,12 @@ jobs:
       - name: 建 Faun + xu4(Allegro 後端)+ 取 U4 freeware 資料
         run: |
           cd cht/xu4
-          ( cd src/faun && ./configure --no_flac && make && sudo make install )
+          # macOS 無 sem_timedwait;faun tmsg.c 的 #else(無 TMSG_WAIT_MS)用它而失敗。
+          # 定義 TMSG_WAIT_MS → 改走可移植 semaphoreTimedWait(有 __APPLE__ dispatch 實作),
+          # 公開 API(tmsg_pushTimeout/popTimeout)簽名不變。OPT 顯式帶齊基礎旗標。
+          ( cd src/faun && ./configure --no_flac && \
+            make OPT="-DUSE_LOAD_MEM -DUSE_SFX_GEN -DTMSG_WAIT_MS" && \
+            sudo make install )
           ./configure --allegro
           make download
           make
