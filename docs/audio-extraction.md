@@ -67,9 +67,12 @@ OKI ADPCM 不是 ffmpeg 的內建輸入格式(`adpcm_ima_oki` 只是 codec、沒
 
 - ✅ **音效 / 取樣(samples)**:三平台都能直接抽成 WAV。FM Towns 連名字都有(攻擊、魔法、
   中毒、馬、火、月相…),X68000 / Amiga 是音效庫,可整批轉或依靜音切段。
-- ⛔ **背景音樂(songs)**:X68000 `ult.mgd`(MML 曲譜)、Amiga `mus*.bin`(序列)都是
-  **給各自音源驅動跑的指令序列**,不是取樣 —— 要還原成音檔得**模擬該平台的聲音驅動**
-  (X68000 的 "YODEL & BIG-X" 自訂驅動、Amiga 的播放器),屬模擬器領域,本手記未涵蓋。
+- 🟡 **背景音樂(songs)**:X68000 `ult.mgd`(MML 曲譜)、Amiga `mus*.bin`(序列)都是
+  **給各自音源驅動跑的指令序列**,不是取樣 —— 要還原成音檔得逆出序列格式 + 模擬音源。
+  - **Amiga**:序列格式已逆向、旋律已抽出(piano-roll 驗證),見
+    **[Amiga 音樂格式逆向手記](amiga-music-format.md)**。
+  - **X68000**:走 YM2151(OPM)FM 合成 + ADPCM,用 ymfm 渲染,見
+    **[YM2151 知識庫](ym2151-knowledge-base.md)**(整理中)。
 - FM Towns 的**背景音樂**走另一條路:它是 CD 紅皮書音軌(CD-DA),直接 `chdman` + `bchunk`
   + `ffmpeg` 抽成 ogg,不需驅動模擬(見 `tools/extract_fmtowns.sh`)。
 
