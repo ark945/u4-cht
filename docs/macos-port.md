@@ -87,6 +87,40 @@ faun 在 macOS 改**靜態**建(`./configure --static` 產 `libfaun.a`)有兩個
 `-lvorbis -logg` 在更後;CoreAudio 符號靠 `-framework AudioToolbox`。順序排對,`xu4` 連結通過,
 Mach-O 帶 `NOUNDEFS`(無未解析符號)。
 
+## 第 6 層:第一個 runtime crash —— Allegro 主執行緒死結(CI 綠 ≠ 跑得起來)
+
+前五層全綠、`.app` 也打包出來了,但在 macOS 26.5.1(Tahoe, Apple Silicon)**一開即崩**。
+這是整個移植第一個**只在真機才現形**的問題 —— CI 的 headless runner 只證明「編得過、連得起、
+包得出來」,證明不了「開得起來」。
+
+crash log 的 backtrace 一看就懂:
+
+```
+Thread 0 Crashed:: Dispatch queue: com.apple.main-thread
+0  libdispatch   __DISPATCH_WAIT_FOR_QUEUE__
+1  libdispatch   _dispatch_sync_f_slow
+2  liballegro    _al_osx_mouse_was_installed
+3  liballegro    osx_init_mouse
+4  liballegro    al_install_mouse
+5  xu4           screenInit_sys → 6 screenInit → 7 servicesInit → 8 main
+```
+
+`EXC_BREAKPOINT (SIGTRAP)`。根因是 **Allegro 在 macOS 的主執行緒契約**:`al_install_mouse`
+會 `dispatch_sync` 一個區塊到**主佇列(主執行緒)**並等它跑完。但 xu4 的 `main` 本身就跑在
+OS 主執行緒上 —— 於是變成「在主執行緒上 dispatch_sync 回主執行緒等自己」,libdispatch 偵測到
+這個自我等待,直接 trap(macOS 26 對主佇列死結的偵測更嚴,舊版可能硬撐或卡住,所以同一份
+arm64 `.app` 在較舊 mac 跑得到標題、Tahoe 卻崩)。
+
+修法是 macOS 上 Allegro 的**標準要求**(只是上游 xu4 沒做):
+- `xu4.cpp` 在 `__APPLE__` 下 `#include <allegro5/allegro.h>` —— 這個標頭會 `#define main
+  _al_mangled_main`,把使用者的 `main` 改名。
+- 連結 `-lallegro_main` —— 它提供**真正的** `main`:在主執行緒建立 NSApplication,另起一條
+  執行緒去呼叫 `_al_mangled_main`(即 xu4 的原 main)。從此使用者程式不在主執行緒跑,
+  `al_install_mouse` 的 `dispatch_sync` 到主執行緒就不再是自我等待。
+
+教訓:**跨平台移植,「連結成功」和「能執行」是兩件事**;有平台慣例(此處是 Allegro 必須經
+其 main 包裝)時,CI 綠燈只是必要條件,真機跑一遍才是充分條件。
+
 ## 解到哪、還沒解到哪(誠實邊界)
 
 - ✅ **Apple Silicon(arm64)**:編譯 → 連結 → 組裝 `.app` → `dylibbundler` 打包相依 dylib →
@@ -94,10 +128,10 @@ Mach-O 帶 `NOUNDEFS`(無未解析符號)。
   都在裡面),解壓即玩。
 - 🟡 **Intel(x86_64)**:同一套修正(brew 前綴差異用 `$(brew --prefix)` 吸收),但 GitHub 的
   `macos-13` runner 供給緊縮、長時間排不到;非 build 問題,等 runner 一有空即補。
-- ⛔ **真機 runtime 未經 CI 驗證**:headless runner 只能證明「編得過、連得起、包得出來」,
-  **不能**證明在真實 Mac 上開得起來、畫面/聲音/中文正常。不過 CoreAudio 後端 + allegro 核心
-  GL context 是 macOS 正確組合,理論上可跑;真機實測需在 Mac 上開 `.app`(首次右鍵「打開」繞
-  Gatekeeper)。
+- 🟡 **真機 runtime**:headless runner 證明不了「開得起來」。實測 macOS 26.5.1 揭出並修掉了
+  第一個真機 crash(第 6 層的 Allegro 主執行緒 SIGTRAP);修正已 build 驗證(連結乾淨、
+  `liballegro_main` 已 bundle),但**最終是否正常顯示/出聲仍待真機回測確認**。CoreAudio 後端 +
+  allegro 核心 GL context 是 macOS 正確組合。開 `.app` 首次需右鍵「打開」繞 Gatekeeper。
 
 ## 方法論(可移植到其他「上游無此平台支援」的移植)
 
