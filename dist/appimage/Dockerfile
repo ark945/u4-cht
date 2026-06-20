@@ -15,10 +15,11 @@ RUN git clone https://git.code.sf.net/p/urlan/boron/code /tmp/boron \
  && make && make DESTDIR=/usr install && make DESTDIR=/usr install-dev
 
 ARG CACHEBUST=1
+RUN echo "cachebust=$CACHEBUST"
 COPY . /build/xu4
 WORKDIR /build/xu4
 RUN cd src/faun && ./configure --no_flac && make && make DESTDIR=/usr install
-RUN ./configure --allegro && make download && make
+RUN ./configure --allegro && make download && make -C src clean && make
 
 # appimagetool + 靜態 runtime(自帶 FUSE,現代桌面不需系統 libfuse2)
 RUN curl -sSL -o /usr/local/bin/appimagetool \

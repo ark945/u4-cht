@@ -22,6 +22,7 @@ RUN curl -sSL -o glfw.zip  https://github.com/glfw/glfw/releases/download/3.4/gl
  && echo "=== usr/lib ===" && ls usr/lib | head -20
 
 ARG CACHEBUST=1
+RUN echo "cachebust=$CACHEBUST"
 COPY . /work/u4
 WORKDIR /work/u4
 RUN mkdir -p .copr/obj /root/.cache/copr && yes a | boron /usr/local/bin/copr -t mingw "os_api:'glfw" make_util:false > /work/copr.log 2>&1 || true; ls -la xu4.exe 2>/dev/null || echo NO_EXE; echo "=====COPR====="; tail -45 /work/copr.log
