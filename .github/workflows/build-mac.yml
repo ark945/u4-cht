@@ -71,12 +71,22 @@ jobs:
       - name: 建 Faun + xu4(Allegro 後端)+ 取 U4 freeware 資料
         run: |
           cd cht/xu4
-          # macOS 無 sem_timedwait;faun tmsg.c 的 #else(無 TMSG_WAIT_MS)用它而失敗。
-          # 定義 TMSG_WAIT_MS → 改走可移植 semaphoreTimedWait(有 __APPLE__ dispatch 實作),
-          # 公開 API(tmsg_pushTimeout/popTimeout)簽名不變。OPT 顯式帶齊基礎旗標。
-          ( cd src/faun && ./configure --no_flac && \
-            make OPT="-DUSE_LOAD_MEM -DUSE_SFX_GEN -DTMSG_WAIT_MS" && \
+          BREW="$(brew --prefix)"
+          # ---- Faun:上游只內建 Android/Linux/Windows 音訊後端,macOS 缺。注入 CoreAudio
+          # (AudioQueue)後端 + 靜態建(避開 GNU -soname、examples 連 -lpulse)。
+          # TMSG_WAIT_MS → 走可移植 semaphoreTimedWait(macOS 無 sem_timedwait)。
+          cp "$GITHUB_WORKSPACE/cht/patches/mac/sys_coreaudio.c" src/faun/
+          perl -0pi -e 's/(#include "sys_wasapi.c"\n)(#else\n#error "Unsupported system")/$1#elif defined(__APPLE__)\n#include "sys_coreaudio.c"\n$2/' src/faun/faun.c
+          grep -q 'sys_coreaudio.c' src/faun/faun.c   # 確認 include 鏈已加 __APPLE__ 分支
+          ( cd src/faun && ./configure --no_flac --static && \
+            make libfaun.a OPT="-DUSE_LOAD_MEM -DUSE_SFX_GEN -DTMSG_WAIT_MS -I$BREW/include" && \
             sudo make install )
+          # ---- project.b:copr 把 macOS 當 unix → 移除 PulseAudio 連結(改 CoreAudio)、
+          # 補 brew/usr-local 標頭與庫路徑 + AudioToolbox framework。
+          perl -pi -e 's/%pulse-simple %pulse //g' project.b
+          perl -0pi -e "s{(include_from \[%src %src/lzw %src/support\]\n)}{\$1\tcflags \"-I/usr/local/include -I$BREW/include\"\n\tlflags \"-L/usr/local/lib -L$BREW/lib -framework AudioToolbox -framework CoreFoundation\"\n}" project.b
+          grep -q 'AudioToolbox' project.b            # 確認 framework/路徑已注入
+          # ---- xu4 本體 ----
           ./configure --allegro
           make download
           make
