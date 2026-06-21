@@ -46,6 +46,18 @@ index f83a553a..65655d06 100644
  		%creature.cpp
  		%death.cpp
  		%debug.cpp
+diff --git a/src/Makefile b/src/Makefile
+index 3d2f3580..b02a9a63 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -43,6 +43,7 @@ endif
+ 
+ CXXFLAGS=-Wall -I. -Isupport $(UIFLAGS) -DVERSION=\"$(VERSION)\"
+ #CXXFLAGS+=-rdynamic -DHAVE_BACKTRACE=1 -DHAVE_VARIADIC_MACROS=1
++CXXFLAGS+=-rdynamic    # U4 繁中化:崩潰 backtrace 能解析函式名(u4chtCrashHandler)
+ 
+ # Choose one of these for debug/release mode.
+ #CXXFLAGS+=-g -DDEBUG
 diff --git a/src/Makefile.common b/src/Makefile.common
 index 6736af1c..ac16f358 100644
 --- a/src/Makefile.common
@@ -700,7 +712,7 @@ index fd2d9817..a309fe59 100644
      uint8_t fixup;              /**< a routine to do miscellaneous fixes to the image */
      Image *image;               /**< the image we're describing */
 diff --git a/src/intro.cpp b/src/intro.cpp
-index acdf1f74..f7eb6a02 100644
+index acdf1f74..249ed1c4 100644
 --- a/src/intro.cpp
 +++ b/src/intro.cpp
 @@ -11,6 +11,8 @@
@@ -735,7 +747,24 @@ index acdf1f74..f7eb6a02 100644
  
  #define GYP_PLACES_FIRST 0
  #define GYP_PLACES_TWOMORE 1
-@@ -416,6 +422,39 @@ uint8_t *IntroController::getSigData() {
+@@ -388,6 +394,16 @@ bool IntroController::hasInitiatedNewGame()
+  * Frees up data not needed after introduction.
+  */
+ void IntroController::deleteIntro() {
++    // U4 繁中化:F2 在片頭播放中(INTRO_TITLES)重載時,titles 動畫向量持有的
++    // srcImage/destImage 必須在此釋放並清空,否則 init() 在 bSkipTitles 下跳過
++    // initTitles,舊向量殘留(懸空/洩漏);原本只在解構子清,F2 路徑漏掉。
++    for (unsigned i = 0; i < titles.size(); i++) {
++        delete titles[i].srcImage;
++        delete titles[i].destImage;
++    }
++    titles.clear();
++    title = titles.begin();
++
+     delete binData;
+     binData = NULL;
+ 
+@@ -416,6 +432,39 @@ uint8_t *IntroController::getSigData() {
  bool IntroController::keyPressed(int key) {
      bool valid = true;
  
@@ -775,7 +804,7 @@ index acdf1f74..f7eb6a02 100644
      switch (mode) {
  
      case INTRO_TITLES:
-@@ -489,11 +528,16 @@ bool IntroController::keyPressed(int key) {
+@@ -489,11 +538,16 @@ bool IntroController::keyPressed(int key) {
  bool IntroController::inputEvent(const InputEvent* ev) {
      if (ev->type == IE_MOUSE_PRESS && ev->n == CMOUSE_LEFT)
      {
@@ -792,7 +821,7 @@ index acdf1f74..f7eb6a02 100644
  
              // Matches text position in updateScreen().
              if (cx >= 10 && cx <= 28) {
-@@ -661,7 +705,7 @@ void IntroController::drawBeastie(int beast, int vertoffset, int frame) {
+@@ -661,7 +715,7 @@ void IntroController::drawBeastie(int beast, int vertoffset, int frame) {
      ASSERT(beast == 0 || beast == 1, "invalid beast: %d", beast);
  
      backgroundArea.draw(beastiesImg, beastieSub[beast] + frame,
@@ -801,7 +830,7 @@ index acdf1f74..f7eb6a02 100644
                          vertoffset);
  }
  
-@@ -721,7 +765,27 @@ void IntroController::drawCard(int card, int x, int y) {
+@@ -721,7 +775,27 @@ void IntroController::drawCard(int card, int x, int y) {
      };
      ASSERT(card < 8, "invalid card: %d", card);
  
@@ -830,7 +859,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  /**
-@@ -753,6 +817,18 @@ void IntroController::updateScreen() {
+@@ -753,6 +827,18 @@ void IntroController::updateScreen() {
          backgroundArea.draw(BKGD_INTRO);
          drawMap();
          drawBeasties();
@@ -849,7 +878,7 @@ index acdf1f74..f7eb6a02 100644
          // display the profile name if a local profile is being used
          {
          const string& pname = xu4.settings->profile;
-@@ -764,7 +840,7 @@ void IntroController::updateScreen() {
+@@ -764,7 +850,7 @@ void IntroController::updateScreen() {
      case INTRO_MENU:
          // draw the extended background for all option screens
          backgroundArea.draw(BKGD_INTRO);
@@ -858,7 +887,7 @@ index acdf1f74..f7eb6a02 100644
  
          // if there is an error message to display, show it
          if (xu4.errorMessage)
-@@ -780,7 +856,7 @@ void IntroController::updateScreen() {
+@@ -780,7 +866,7 @@ void IntroController::updateScreen() {
              EventHandler::wait_msecs(3000);
              // clear the screen again
              backgroundArea.draw(BKGD_INTRO);
@@ -867,7 +896,7 @@ index acdf1f74..f7eb6a02 100644
          }
  
          menuArea.textAt(1,  1, "In another world, in a time to come.");
-@@ -808,7 +884,7 @@ void IntroController::updateScreen() {
+@@ -808,7 +894,7 @@ void IntroController::updateScreen() {
  void IntroController::initiateNewGame() {
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_INTRO);
@@ -876,7 +905,7 @@ index acdf1f74..f7eb6a02 100644
  
      // display name prompt and read name from keyboard
      menuArea.textAt(3, 3, "By what name shalt thou be known");
-@@ -831,7 +907,7 @@ void IntroController::initiateNewGame() {
+@@ -831,7 +917,7 @@ void IntroController::initiateNewGame() {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_INTRO);
@@ -885,7 +914,7 @@ index acdf1f74..f7eb6a02 100644
  
      // display sex prompt and read sex from keyboard
      menuArea.textAt(3, 3, "Art thou Male or Female?");
-@@ -1035,14 +1111,21 @@ void IntroController::startQuestions() {
+@@ -1035,14 +1121,21 @@ void IntroController::startQuestions() {
          questionArea.textAt(0, 1, gypsyText[GYP_UPON_TABLE].c_str());
          EventHandler::wait_msecs(1000);
  
@@ -911,7 +940,7 @@ index acdf1f74..f7eb6a02 100644
          drawCard(questionTree[i2], cardPos->x + cardPos->width, cardPos->y);
          questionArea.textAt(0, 3, "\"Consider this:\"");
          questionArea.showCursor();
-@@ -1103,7 +1186,7 @@ void IntroController::journeyOnward() {
+@@ -1103,7 +1196,7 @@ void IntroController::journeyOnward() {
  void IntroController::about() {
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_INTRO);
@@ -920,7 +949,7 @@ index acdf1f74..f7eb6a02 100644
  
      screenHideCursor();
      menuArea.textAtFmt(14, 1, "XU4 %s", VERSION);
-@@ -1125,7 +1208,9 @@ void IntroController::about() {
+@@ -1125,7 +1218,9 @@ void IntroController::about() {
   * Shows text in the question area.
   */
  void IntroController::showText(const string &text) {
@@ -931,7 +960,7 @@ index acdf1f74..f7eb6a02 100644
      int lineNo = 0;
  
      questionArea.clear();
-@@ -1166,6 +1251,12 @@ void IntroController::runMenu(Menu *menu, TextView *view, bool withBeasties) {
+@@ -1166,6 +1261,12 @@ void IntroController::runMenu(Menu *menu, TextView *view, bool withBeasties) {
   * map, the beasties, etc..
   */
  void IntroController::timerFired() {
@@ -944,7 +973,7 @@ index acdf1f74..f7eb6a02 100644
      screenCycle();
  
      if (mode == INTRO_TITLES)
-@@ -1270,7 +1361,7 @@ void IntroController::updateConfMenu(MenuEvent &event) {
+@@ -1270,7 +1371,7 @@ void IntroController::updateConfMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -953,7 +982,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  void IntroController::updateVideoMenu(MenuEvent &event) {
-@@ -1307,7 +1398,7 @@ void IntroController::updateVideoMenu(MenuEvent &event) {
+@@ -1307,7 +1408,7 @@ void IntroController::updateVideoMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -962,7 +991,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  void IntroController::updateGfxMenu(MenuEvent &event)
-@@ -1327,7 +1418,7 @@ void IntroController::updateGfxMenu(MenuEvent &event)
+@@ -1327,7 +1428,7 @@ void IntroController::updateGfxMenu(MenuEvent &event)
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -971,7 +1000,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  void IntroController::updateSoundMenu(MenuEvent &event) {
-@@ -1361,7 +1452,7 @@ void IntroController::updateSoundMenu(MenuEvent &event) {
+@@ -1361,7 +1462,7 @@ void IntroController::updateSoundMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -980,7 +1009,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  void IntroController::updateInputMenu(MenuEvent &event) {
-@@ -1389,7 +1480,7 @@ void IntroController::updateInputMenu(MenuEvent &event) {
+@@ -1389,7 +1490,7 @@ void IntroController::updateInputMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -989,7 +1018,7 @@ index acdf1f74..f7eb6a02 100644
  
      // after drawing the menu, extra menu text can be added here
      extendedMenuArea.textAt(0, 5, "Mouse Options:");
-@@ -1420,7 +1511,7 @@ void IntroController::updateSpeedMenu(MenuEvent &event) {
+@@ -1420,7 +1521,7 @@ void IntroController::updateSpeedMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -998,7 +1027,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  void IntroController::updateGameplayMenu(MenuEvent &event) {
-@@ -1444,7 +1535,7 @@ void IntroController::updateGameplayMenu(MenuEvent &event) {
+@@ -1444,7 +1545,7 @@ void IntroController::updateGameplayMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -1007,7 +1036,7 @@ index acdf1f74..f7eb6a02 100644
  }
  
  void IntroController::updateInterfaceMenu(MenuEvent &event) {
-@@ -1468,7 +1559,7 @@ void IntroController::updateInterfaceMenu(MenuEvent &event) {
+@@ -1468,7 +1569,7 @@ void IntroController::updateInterfaceMenu(MenuEvent &event) {
  
      // draw the extended background for all option screens
      backgroundArea.draw(BKGD_OPTIONS_TOP, 0, 0);
@@ -1016,7 +1045,7 @@ index acdf1f74..f7eb6a02 100644
  
      // after drawing the menu, extra menu text can be added here
      extendedMenuArea.textAt(2, 3, "  (Open, Jimmy, etc.)");
-@@ -1703,8 +1794,8 @@ void IntroController::initTitles()
+@@ -1703,8 +1804,8 @@ void IntroController::initTitles()
  void IntroController::addTitle(int x, int y, int w, int h, AnimType method, int delay, int duration)
  {
      AnimElement data = {
@@ -1027,7 +1056,7 @@ index acdf1f74..f7eb6a02 100644
          method,             // render method
          0,                  // animStep
          0,                  // animStepMax
-@@ -1777,8 +1868,8 @@ void IntroController::getTitleSourceData()
+@@ -1777,8 +1878,8 @@ void IntroController::getTitleSourceData()
                          color = info->image->setColor(255, (y == 2 ? 250 : 255), blue[y-1]);
                      }
                      AnimPlot plot = {
@@ -1038,7 +1067,7 @@ index acdf1f74..f7eb6a02 100644
                          uint8_t(color.r),
                          uint8_t(color.g),
                          uint8_t(color.b),
-@@ -1800,15 +1891,15 @@ void IntroController::getTitleSourceData()
+@@ -1800,15 +1901,15 @@ void IntroController::getTitleSourceData()
              {
                  for (int y=0; y < titles[i].rh; y++)
                  {
@@ -1057,7 +1086,7 @@ index acdf1f74..f7eb6a02 100644
                                  uint8_t(r), uint8_t(g), uint8_t(b), uint8_t(a)
                              };
                              titles[i].plotData.push_back(plot);
-@@ -1904,12 +1995,12 @@ bool IntroController::updateTitle()
+@@ -1904,12 +2005,12 @@ bool IntroController::updateTitle()
          {
              while (animStepTarget > title->animStep)
              {
@@ -2381,7 +2410,7 @@ index 767f30a8..3f6abe41 100644
  /* text area (in character units) */
  #define TEXT_AREA_X 24
 diff --git a/src/xu4.cpp b/src/xu4.cpp
-index 6a01ed57..720efd28 100644
+index 6a01ed57..90882546 100644
 --- a/src/xu4.cpp
 +++ b/src/xu4.cpp
 @@ -34,6 +34,7 @@ extern "C" const char* androidInternalData();
@@ -2392,7 +2421,7 @@ index 6a01ed57..720efd28 100644
  #endif
  
  #ifdef DEBUG
-@@ -349,13 +350,47 @@ static void servicesReset(XU4GameServices* gs) {
+@@ -349,13 +350,80 @@ static void servicesReset(XU4GameServices* gs) {
  
  XU4GameServices xu4;
  
@@ -2406,8 +2435,41 @@ index 6a01ed57..720efd28 100644
 +#include <mach-o/dyld.h>   // _NSGetExecutablePath:讓 .app 直接當主程式時自己定位資料夾
 +#include <unistd.h>        // chdir
 +#endif
++
++// U4 繁中化:崩潰時把訊號與 backtrace 直接印到 console(stderr),不再無聲當掉。
++// 用 backtrace_symbols_fd(寫 fd,不 malloc)→ signal handler 內可安全呼叫。
++// 符號可讀性需連結時帶 -rdynamic(見 src/Makefile)。
++#if defined(__linux__) || defined(__APPLE__)
++#include <execinfo.h>
++#include <csignal>
++#include <unistd.h>
++static void u4chtCrashHandler(int sig) {
++    const char* name = (sig == SIGSEGV) ? "SIGSEGV" :
++                       (sig == SIGABRT) ? "SIGABRT" :
++                       (sig == SIGFPE)  ? "SIGFPE"  :
++                       (sig == SIGBUS)  ? "SIGBUS"  : "signal";
++    char msg[128];
++    int n = snprintf(msg, sizeof(msg),
++                     "\n*** U4-CHT 崩潰:%s (%d) — backtrace ***\n", name, sig);
++    if (n > 0) { ssize_t w = write(2, msg, (size_t) n); (void) w; }
++    void* bt[40];
++    int sz = backtrace(bt, 40);
++    backtrace_symbols_fd(bt, sz, 2);    // 直接寫 stderr,signal-safe
++    signal(sig, SIG_DFL);
++    raise(sig);                         // 回預設處理(保留 core / 正常退出碼)
++}
++static void u4chtInstallCrashHandler(void) {
++    signal(SIGSEGV, u4chtCrashHandler);
++    signal(SIGABRT, u4chtCrashHandler);
++    signal(SIGFPE,  u4chtCrashHandler);
++    signal(SIGBUS,  u4chtCrashHandler);
++}
++#else
++static void u4chtInstallCrashHandler(void) {}
++#endif
  
  int main(int argc, char *argv[]) {
++    u4chtInstallCrashHandler();
 +#ifdef __APPLE__
 +    // .app 雙擊時 cwd 為 /,且本程式可直接當 CFBundleExecutable(不靠 launch 腳本)。
 +    // 依執行檔自身路徑 chdir 到資料夾,讓 xu4 找得到 ultima4.zip / *.mod / 字型:

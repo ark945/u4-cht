@@ -54,7 +54,8 @@ RUN set -e; \
     ls $AD/usr/lib | wc -l
 
 # 打包 AppImage(用靜態 runtime,免系統 libfuse2)
-RUN cd /build && ARCH=x86_64 appimagetool --appimage-extract-and-run \
+# NO_STRIP=1:不要剝符號,讓崩潰 backtrace(u4chtCrashHandler + -rdynamic)能解析函式名。
+RUN cd /build && ARCH=x86_64 NO_STRIP=1 appimagetool --appimage-extract-and-run \
       --runtime-file /usr/local/bin/runtime-x86_64 \
       AppDir u4-cht-x86_64.AppImage 2>&1 | tail -5
 
