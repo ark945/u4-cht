@@ -6,7 +6,7 @@ OUT="${1:-/tmp/u4-cht-linux-x86_64.tar.gz}"
 TMP="$(mktemp -d)/u4-cht-linux"; mkdir -p "$TMP"
 docker run --rm -v "$TMP":/out --entrypoint bash u4cht/xu4-allegro -c '
   cp /build/xu4/src/xu4 /out/
-  cp /build/xu4/Ultima-IV.mod /build/xu4/U4-Upgrade.mod /build/xu4/render.pak /out/
+  cp /build/xu4/Ultima-IV.mod /build/xu4/U4-*.mod /build/xu4/render.pak /out/
   cp /build/xu4/cjk_font*.bin /build/xu4/u4_cht.tab /out/
   cp /build/xu4/ultima4.zip /build/xu4/u4upgrad.zip /out/ 2>/dev/null || true
   cp -L /usr/lib/x86_64-linux-gnu/libfaun.so.0 /out/'

@@ -3,13 +3,14 @@
 # 用法:bash dist/win/make-zip.sh [輸出.zip]
 set -e
 OUT="${1:-/tmp/u4-cht-windows-x64.zip}"
+OUT="$(realpath -m "$OUT")"          # 解析為絕對路徑(下方 cd 到 tmp 再 zip,相對 OUT 會失效)
 D="$(mktemp -d)/u4-cht-windows"; mkdir -p "$D"
 # exe + DLL
 docker run --rm -v "$D":/out --entrypoint bash u4cht/win -c \
   'cp /work/u4/xu4.exe /work/dll/*.dll /out/'
 # 平台無關資料(從 Linux build)
 docker run --rm -v "$D":/out --entrypoint bash u4cht/xu4-allegro -c '
-  cp /build/xu4/Ultima-IV.mod /build/xu4/U4-Upgrade.mod /build/xu4/render.pak /out/
+  cp /build/xu4/Ultima-IV.mod /build/xu4/U4-*.mod /build/xu4/render.pak /out/
   cp /build/xu4/cjk_font*.bin /build/xu4/u4_cht.tab /out/
   cp /build/xu4/ultima4.zip /build/xu4/u4upgrad.zip /out/ 2>/dev/null || true'
 # run.bat(字形:set U4CHT_FONT=firefly 再執行)
