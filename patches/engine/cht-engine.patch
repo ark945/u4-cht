@@ -2031,8 +2031,46 @@ index 8bfa3de..095db10 100644
  
  #include <string>
  #include "view.h"
+diff --git a/src/tileanim.cpp b/src/tileanim.cpp
+index bafea6b..e8f3f9a 100644
+--- a/src/tileanim.cpp
++++ b/src/tileanim.cpp
+@@ -189,3 +189,21 @@ TileAnim* TileAnimSet::getByName(Symbol name) const
+         return NULL;
+     return i->second;
+ }
++
++/*
++ * U4 繁中化:檢查 anim 指標是否為本集合的成員。
++ * 主題切換(F2)會 delete 舊 tileanims 再建新;若某 tile 的 anim 仍指向舊集合已釋放的
++ * TileAnim,其指標值不會出現在新集合 → 回傳 false,呼叫端據此退回靜態繪製,避免
++ * 在 TileAnim::draw deref 懸空指標而 segfault。只比對指標『值』、不 deref 傳入指標,
++ * 故對懸空指標安全。集合很小(~20),線性掃描即可。
++ */
++bool TileAnimSet::contains(const TileAnim* a) const
++{
++    if (! a)
++        return false;
++    for (TileAnimMap::const_iterator i = tileanims.begin();
++         i != tileanims.end(); ++i)
++        if (i->second == a)
++            return true;
++    return false;
++}
+diff --git a/src/tileanim.h b/src/tileanim.h
+index 914bb89..c72fb03 100644
+--- a/src/tileanim.h
++++ b/src/tileanim.h
+@@ -109,6 +109,7 @@ public:
+ 
+     ~TileAnimSet();
+     TileAnim* getByName(Symbol name) const;
++    bool contains(const TileAnim* a) const;     // U4 繁中化:驗證 anim 指標是否屬本集合
+ 
+     TileAnimMap tileanims;
+ };
 diff --git a/src/tileview.cpp b/src/tileview.cpp
-index f13c0c5..3c5e55a 100644
+index f13c0c5..5a43149 100644
 --- a/src/tileview.cpp
 +++ b/src/tileview.cpp
 @@ -46,6 +46,11 @@ TileView::~TileView() {
@@ -2047,7 +2085,7 @@ index f13c0c5..3c5e55a 100644
      //Scratchpad needs to be re-inited if we rescale...
      if (animated)
      {
-@@ -75,6 +80,11 @@ void TileView::drawTile(const MapTile &mapTile, int x, int y) {
+@@ -75,8 +80,19 @@ void TileView::drawTile(const MapTile &mapTile, int x, int y) {
      ASSERT(x < columns, "x value of %d out of range", x);
      ASSERT(y < rows, "y value of %d out of range", y);
  
@@ -2056,9 +2094,18 @@ index f13c0c5..3c5e55a 100644
 +    if (!tile || !tile->getImage())
 +        return;
 +
++    /* U4 繁中化:只有當 tile 的 anim 確實屬於『目前』tileanims 才動畫繪製。
++       主題切換(F2)delete 舊 tileanims 後,殘留 tile 的 anim 會懸空,直接 deref 會在
++       TileAnim::draw 崩潰(intro F2 切換後的 segfault)。anim 不在現用集合 → 退回靜態繪製。 */
++    const TileAnimSet* curAnims = screenState()->tileanims;
++    bool animOK = tile->getAnim() && curAnims && curAnims->contains(tile->getAnim());
++
      // draw the tile to the screen
-     if (tile->getAnim()) {
+-    if (tile->getAnim()) {
++    if (animOK) {
          // First, create our animated version of the tile
+         tile->getAnim()->draw(animated, tile, mapTile, DIR_NONE);
+ 
 diff --git a/src/u4.h b/src/u4.h
 index 767f30a..3f6abe4 100644
 --- a/src/u4.h
