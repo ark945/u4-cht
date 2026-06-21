@@ -24,10 +24,12 @@ echo "[2/5] 抽 iso 資料軌 + bchunk 音軌"
 ( cd "$WORK" && bchunk -w u4.bin u4.cue trk >/dev/null )
 7z x -y -o"$WORK/iso" "$WORK/trk01.iso" >/dev/null 2>&1
 
-echo "[3/5] 解碼 tileset(ULTIMA4.TIL → fmt_tileset.png)"
-TIL=$(find "$WORK/iso" -iname ULTIMA4.TIL | head -1)
+echo "[3/5] 建 tileset(mshapes4.png → fmt_tileset.png)"
+# ULTIMA4.TIL 的 16-bit 像素格式未解開(實測非標準 RGB565/555,水偏紫)→ 改用已正確
+# 還原的 materals/fmtowns/mshapes4.png(16×16 格 shapes)重建。TIL 解碼待補。
+MSH="$ROOT/materals/fmtowns/mshapes4.png"
 mkdir -p "$MOD/image/vga" "$MOD/music"
-python3 "$ROOT/tools/build_fmtowns_tileset.py" --til "$TIL" --out "$MOD/image/fmt_tileset.png"
+python3 "$ROOT/tools/build_fmtowns_tileset.py" --msh "$MSH" --out "$MOD/image/fmt_tileset.png"
 
 echo "[4/5] CD 音樂 → ogg(2 軌)"
 i=0

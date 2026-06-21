@@ -1,52 +1,52 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-把 FM Towns 版 Ultima IV 的 ULTIMA4.TIL 解碼成 xu4 可用的 tileset PNG。
+把 FM Towns 版 Ultima IV 的 shapes 圖建成 xu4 可用的 tileset PNG(16×4096)。
 
-ULTIMA4.TIL = 256 tile × (16×16 px × 2 byte) = 131072 byte,16-bit 直色(RGB565,
-little-endian),且本來就是 U4 標準 256-tile 順序 → 直接堆成 16 寬 × 4096 高的
-tileset(xu4 `tiles: 256` 格式),當 FM Towns 美術主題。
+來源:materals/fmtowns/mshapes4.png —— FM Towns U4 的 256-tile shapes,排成
+16×16 格、每格 64×64(原 16×16 的 4 倍 nearest 放大),canonical U4 256-tile 順序。
+本腳本逐格抽出、降採樣回 16×16、依序堆成 16 寬 × 4096 高的垂直條(xu4 `tiles: 256`)。
 
-ULTIMA4.TIL 取自使用者自有的 FM Towns 光碟(.chd → iso → U4OPEN/U4_J/ULTIMA4.TIL),
-屬版權遊戲資料,不入 repo(引擎/資料分離)。
+> 為何不直接解 ULTIMA4.TIL:該 TIL 為 256 個連續 16×16 tile 的 16-bit 直色,但實測
+> 其 16-bit 像素格式非標準 RGB565/555(LE/BE/BGR 各變體解出的水都偏紫、人物顏色錯),
+> 確切位元佈局未解開;mshapes4.png 是已正確還原的同資料,直接採用。TIL 解碼待日後補。
+
+FM Towns shapes 屬版權遊戲資料,不入 repo(引擎/資料分離);輸出留本機。
 
 用法:
-  python3 tools/build_fmtowns_tileset.py --til <ULTIMA4.TIL> --out fmt_tileset.png
+  python3 tools/build_fmtowns_tileset.py --msh <mshapes4.png> --out fmt_tileset.png
 """
 import argparse
-import struct
-
 from PIL import Image
 
-TILE = 16
 N_TILES = 256
-BYTES_PER_TILE = TILE * TILE * 2   # 16-bit/px
+COLS = 16        # mshapes4 每列 16 格
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--til", required=True, help="FM Towns ULTIMA4.TIL")
+    ap.add_argument("--msh", required=True, help="FM Towns mshapes4.png(16×16 格)")
     ap.add_argument("--out", required=True, help="輸出 tileset PNG(16×4096)")
     args = ap.parse_args()
 
-    d = open(args.til, "rb").read()
-    need = N_TILES * BYTES_PER_TILE
-    if len(d) < need:
-        raise SystemExit(f"ULTIMA4.TIL 太小:{len(d)} < {need}")
+    m = Image.open(args.msh).convert("RGB")
+    W, H = m.size
+    ts = W // COLS                      # 來源每格邊長(mshapes4 = 64)
+    if ts < 16 or W % COLS:
+        raise SystemExit(f"mshapes4 尺寸異常:{W}×{H}(每列 {COLS} 格無法整除)")
 
-    img = Image.new("RGB", (TILE, TILE * N_TILES))
-    px = img.load()
-    for t in range(N_TILES):
-        base = t * BYTES_PER_TILE
-        for i in range(TILE * TILE):
-            w = struct.unpack_from("<H", d, base + i * 2)[0]   # RGB565 LE
-            r = (w >> 11) & 0x1F
-            g = (w >> 5) & 0x3F
-            b = w & 0x1F
-            px[i % TILE, t * TILE + i // TILE] = (
-                r * 255 // 31, g * 255 // 63, b * 255 // 31)
-    img.save(args.out)
-    print(f"FM Towns tileset:{N_TILES} tile → {args.out} ({img.size[0]}×{img.size[1]})")
+    out = Image.new("RGB", (16, 16 * N_TILES))
+    po = out.load()
+    for idx in range(N_TILES):
+        gr, gc = idx // COLS, idx % COLS
+        tile = m.crop((gc * ts, gr * ts, gc * ts + ts, gr * ts + ts)) \
+                .resize((16, 16), Image.NEAREST)
+        tp = tile.load()
+        for y in range(16):
+            for x in range(16):
+                po[x, idx * 16 + y] = tp[x, y]
+    out.save(args.out)
+    print(f"FM Towns tileset:{N_TILES} tile → {args.out} (16×{16*N_TILES})")
 
 
 if __name__ == "__main__":
