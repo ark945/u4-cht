@@ -19,13 +19,16 @@ for i in range(16):
     pal.append((((w>>8)&0xF)*17,((w>>4)&0xF)*17,(w&0xF)*17))
 tiles=d[32:]; NT=256
 def decode(tb):
+    # Amiga 交錯式 bitplane:每 row 8 byte = 兩半(pixels 0-7 / 8-15),每半 4 byte =
+    # 4 個 plane 各 1 byte(plane0..3 依序)。byte 內 MSB 為左像素;像素色 = 4 plane 位元組合。
+    # (原本誤把『每 plane 的 2 byte 相鄰』→ 只有 plane0 生效,顏色全錯。)
     out=[0]*256
     for r in range(16):
-        for pl in range(4):
-            for byi in range(2):
-                bb=tb[r*8+pl*2+byi]
+        for h in range(2):              # 兩半:0=pixels 0-7,1=pixels 8-15
+            for pl in range(4):         # 每 byte 一個 plane
+                bb=tb[r*8 + h*4 + pl]
                 for bit in range(8):
-                    if (bb>>(7-bit))&1: out[r*16+byi*8+bit]|=(1<<pl)
+                    if (bb>>(7-bit))&1: out[r*16 + h*8 + bit]|=(1<<pl)
     return out
 img=Image.new("RGB",(16,16*NT)); p=img.load()
 for t in range(NT):
